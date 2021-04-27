@@ -1,13 +1,23 @@
 import bcrypt from "bcrypt";
-import database from "../util/database.util";
 import jwt from "jsonwebtoken";
 import UserModel from "../model/user.model";
 
 class AuthenticationService {
-    private _db = database;
-
-    public async getUserByEmailAndPassword(email: string, password: string) {
-        //get by email
+    public async login(email: string, password: string) {
+        console.log("login service")
+        try {
+            const result = await UserModel.getByEmailAndPassword(email, password);
+            console.log("result", result);
+            return {
+                status: "success",
+                token: result.token
+            }
+        } catch(error) {
+            return {
+                status: "error",
+                error: `${error}`
+            }
+        }
     }
 
     public async signUp(signUpInfo) {

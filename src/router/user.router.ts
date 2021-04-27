@@ -5,7 +5,7 @@ import AuthService from "../service/authentication.service";
 class UserRouter {
     public path = "/user"
     public router = Router()
-    private authService = new AuthService();
+    private _authService = new AuthService();
     
     constructor() {
         this.initializeRoutes();
@@ -18,8 +18,8 @@ class UserRouter {
 
     private signUp = async (req: Request, res: Response) => {
         try {
-            const result = await this.authService.signUp(req.body)
-
+            const result = await this._authService.signUp(req.body)
+            
             if (result.status === "success") {
                 res.status(200).send(result);
             } else {
@@ -33,8 +33,24 @@ class UserRouter {
         }
     }
 
-    private login(req: Request, res: Response, next: NextFunction) {
+    private login = async (req: Request, res: Response, next: NextFunction) => {
         console.log("user login")
+        try {
+            const email = req.body.email;
+            const password = req.body.password;
+            const result = await this._authService.login(email, password);
+            if (result.status === "success") {
+                res.status(200).send(result);
+            } else {
+                throw new Error(result.error);
+            }
+        } catch(error) {
+            console.log("error", error)
+            res.status(400).send({
+                status: "error",
+                error: `${error}`
+            })
+        }
     }
 }
 

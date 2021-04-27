@@ -6,7 +6,6 @@ const account = serviceAccount as admin.ServiceAccount;
 
 admin.initializeApp({
     credential: admin.credential.cert(account),
-    databaseURL: process.env.DATABASE_URL
 });
 
 
