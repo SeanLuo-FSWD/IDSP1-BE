@@ -1,38 +1,57 @@
 import request from "supertest"
 
-const emailField = {
-    email: ""
-}
-
 
 describe("/POST /signup", () => {
     describe("When email field is empty", () => {
         test("Should return error: Empty email field", async () => {
-            const emailField = {
+            const signUpData = {
                 email: "",
-                password: "qwlkejqwr"
+                password: "qwF#lkejqwr"
             };
 
-            const response = await request(app).post("/signup").send(emailField);
+            const response = await request(app).post("/signup").send(signUpData);
 
             //{ error: "Email field cannot be empty." }
             expect(response.body.error).toEqual("Error: Email field cannot be empty.")
         })
     })
-})
 
-describe("/POST /signup", () => {
-    describe("when password field is empty", () => {
-        test("should return error, please enter password", async () => {
-            const password = {
+    describe("When password field is empty", () => {
+        test("Should return error: Empty password field", async () => {
+            const signUpData = {
+                email: "123@gmail.com",
                 password: ""
-            })
+            };
 
-            const response = await (await request(app).post('/signup')).setEncoding(postdata)
-            expect(response.statusCode).toEqual()
-        }
-    }
+            const response = await request(app).post("/signup").send(signUpData);
+            //{ error: "Email field cannot be empty." }
+            expect(response.body.error).toEqual("Error: Email field cannot be empty.")
+        })
+    })
 
+    describe("When validation is met and register is successful", () => {
+        test("Should return status code 200", async () => {
+            const signUpData = {
+                email: "123@gmail.com",
+                password: "Ad34567#dsg"
+            };
 
+            const response = await request(app).post("/signup").send(signUpData);
+            expect(response.statuscode).toEqual(200)
+        })
+    })
     
+    describe("When validation is NOT met and register is NOT successful", () => {
+        test("Should return status code 400", async () => {
+            const signUpData = {
+                email: "123@gmail.com",
+                password: "Ad34567#dsg"
+            };
+
+            const response = await request(app).post("/signup").send(signUpData);
+            expect(response.statuscode).toEqual(400)
+        })
+    })
+
 })
+
