@@ -2,11 +2,12 @@
   "name": "idsp2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.ts",
+  "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test login": "npx jest ./testing/login.test.js"
+    "testLogin": "npx jest ./testing/login.test.js",
+    "testSignup": "npx jest ./testing/signup.test.ts"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/kjohnathan/idsp2#readme",
   "dependencies": {
+    "@babel/preset-typescript": "^7.13.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -30,8 +32,11 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
+    "@types/jest": "^26.0.23",
     "@types/node": "^15.0.0",
+    "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
+    "ts-jest": "^26.5.5",
     "ts-node-dev": "^1.1.6",
     "typescript": "^4.2.4"
   }

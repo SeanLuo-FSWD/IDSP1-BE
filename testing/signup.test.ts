@@ -1,5 +1,8 @@
-import request from "supertest"
+import request from "supertest";
 
+import App from "../app";
+
+const app = new App().app;
 
 describe("/POST /signup", () => {
     describe("When email field is empty", () => {
@@ -10,7 +13,7 @@ describe("/POST /signup", () => {
                 passwordCheck: "qwF#lkejqwr"
             };
 
-            const response = await request(app).post("/signup").send(signUpData);
+            const response = await request(app).post("/api/user/signUp").send(signUpData);
 
             //{ error: "Email field cannot be empty." }
             expect(response.body.error).toEqual("Error: Email field cannot be empty.")
@@ -25,7 +28,7 @@ describe("/POST /signup", () => {
                 passwordCheck: ""
             };
 
-            const response = await request(app).post("/signup").send(signUpData);
+            const response = await request(app).post("/api/user/signUp").send(signUpData);
             //{ error: "Email field cannot be empty." }
             // Need to specify when both password && passwordCheck == empty 
             // If only one = empty, error becomes -> "Passwords do not match."
@@ -41,7 +44,7 @@ describe("/POST /signup", () => {
                 passwordCheck: ""
             };
 
-            const response = await request(app).post("/signup").send(signUpData);
+            const response = await request(app).post("/api/user/signUp").send(signUpData);
             //{ error: "Email field cannot be empty." }
             // Need to specify when both password && passwordCheck == empty 
             // If only one = empty, error becomes -> "Passwords do not match."
@@ -55,10 +58,10 @@ describe("/POST /signup", () => {
                 email: "123@gmail.com",
                 // valid = email + pass + passcheck + email != alreadyExists
                 password: "Ad34567#dsg",
-                password: "Ad34567#dsg"
+                passwordCheck: "Ad34567#dsg"
             };
 
-            const response = await request(app).post("/signup").send(signUpData);
+            const response = await request(app).post("/api/user/signUp").send(signUpData);
             expect(response.statuscode).toEqual(200)
         })
     })
@@ -72,7 +75,7 @@ describe("/POST /signup", () => {
                 passwordCheck: "Ad3456"
             };
 
-            const response = await request(app).post("/signup").send(signUpData);
+            const response = await request(app).post("/api/user/signUp").send(signUpData);
             expect(response.statuscode).toEqual(400)
         })
     })

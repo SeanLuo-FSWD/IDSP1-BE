@@ -28,6 +28,10 @@ class App {
     public initAPIRouter() {
         this._app.use("/", this.apiRouter.router);
     }
+
+    get app() {
+        return this._app;
+    }
 }
 
 export default App;
