@@ -17,20 +17,19 @@ class UserRouter {
     }
 
     private signUp = async (req: Request, res: Response) => {
-        console.log("sign up")
-        const email = req.body.email;
-        const password = req.body.password;
+        try {
+            const result = await this.authService.signUp(req.body)
 
-        const userExisted = await this.authService.findUserByEmail(email)
-
-        if (userExisted) {
-            res.send({
+            if (result.status === "success") {
+                res.status(200).send(result);
+            } else {
+                throw new Error(result.error);
+            }
+        } catch(error) {
+            res.status(400).send({
                 status: "error",
-                error: "User already exists."
+                error: `${error}`
             })
-        } else {
-            const result = await this.authService.createUser(email, password);
-            res.send(result);
         }
     }
 
