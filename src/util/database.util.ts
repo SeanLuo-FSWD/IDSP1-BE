@@ -9,4 +9,6 @@ admin.initializeApp({
     databaseURL: process.env.DATABASE_URL
 });
 
-export default admin;
+
+
+export default admin.firestore();
