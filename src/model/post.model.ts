@@ -2,7 +2,7 @@ import database from "../util/database.util";
 import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 
-class postModel {
+class PostModel {
     private _db = database;
     private userId: string;
     private timeStamp: string;
@@ -10,9 +10,9 @@ class postModel {
     private images: string[];
     private postCollection = this._db.collection("posts");
     
-    constructor(input) {
-        this.userId = input.userId;
-        this.timeStamp = input.timeStamp;
+    constructor(userId: string, input) {
+        this.userId = userId;
+        this.timeStamp = new Date().toString();
         this.text = input.text;
         this.images = input.images;//[] for no images,
     }
@@ -25,11 +25,9 @@ class postModel {
                 postId: postId,
                 userId: this.userId,
                 timeStamp: this.timeStamp,
-                text: this.text
+                text: this.text,
+                images: this.images
             }
-
-            console.log(postId);
-            console.log(postId);
 
             const result = await database.collection('post').doc(postId).set(newPost)
 
@@ -88,4 +86,4 @@ class postModel {
     // }
 }
 
-export default postModel;
+export default PostModel;

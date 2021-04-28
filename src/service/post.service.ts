@@ -1,16 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import postModel from "../model/post.model";
+import PostModel from "../model/post.model";
 
 class PostService {
-
-
-    public async createPost(postData) {
+    public async createPost(userId, postData) {
         try {
-            const postContent = new postModel(postData);
-
+            const postContent = new PostModel(userId, postData);
+            console.log(postContent);
             await postContent.createPost();
-    
+            
             return {
                 status: "success"
             }

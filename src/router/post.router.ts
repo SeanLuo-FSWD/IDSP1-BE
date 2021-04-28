@@ -1,6 +1,14 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import PostService from "../service/post.service";
 
+declare global {
+    namespace Express {
+        interface Request {
+            user: any
+        }
+    }
+}
+
 class PostRouter {
     // /api/post
     public path = "/post"
@@ -16,23 +24,14 @@ class PostRouter {
     }
 
     private createPost = async (req: Request, res: Response) => {
-        console.log("create post");
-
-        // const postOwner = database.users.find(user.userid === postId.userId)
-
+        console.log("-- create post -- ");
+        const userId = "ashjdqwirq";
+        console.log(req.body);  
         try {
-            const result = await this._postService.createPost(req.body);
-            
-            if (result.status === "success") {
-                res.status(200).send(result);
-            } else {
-                throw new Error(result.error);
-            }
+            const result = await this._postService.createPost(userId, req.body);
+            console.log(result);
         } catch(error) {
-            res.status(400).send({
-                status: "error",
-                error: `${error}`
-            })
+            res.status(400).send({ message: error });
         }
     }
 
