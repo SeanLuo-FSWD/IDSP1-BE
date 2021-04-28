@@ -9,7 +9,7 @@ declare global {
 }
 
 function checkAuth(req: Request, res: Response, next: NextFunction) {
-    console.log(req);
+    console.log(req.isAuthenticated());
     if (req.isAuthenticated()) {
         return next();
     }

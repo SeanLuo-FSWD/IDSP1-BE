@@ -32,7 +32,7 @@ class AuthenticationService {
                 })
             })(req, res, next);
         })
-    }
+    };
 
     public async signUp(signUpInfo) {
         //signUpInfo: { email: .., password: .. }
@@ -58,7 +58,7 @@ class AuthenticationService {
                 error: `${error}`
             }
         }
-    }
+    };
 }
 
 export default AuthenticationService;

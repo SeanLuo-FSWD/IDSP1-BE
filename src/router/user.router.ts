@@ -1,6 +1,14 @@
 import { Request, Response, NextFunction, Router } from "express";
 import AuthService from "../service/authentication.service";
 
+declare global {
+    namespace Express {
+        interface Request {
+            logout: any
+        }
+    }
+}
+
 
 class UserRouter {
     public path = "/user";
@@ -14,6 +22,7 @@ class UserRouter {
     private initializeRoutes() {
         this.router.post(`${this.path}/signUp`, this.signUp);
         this.router.post(`${this.path}/login`, this.login);
+        this.router.get(`${this.path}/logout`, this.logout);
     }
 
     private signUp = async (req: Request, res: Response) => {
@@ -40,6 +49,12 @@ class UserRouter {
         } catch(err) {
             res.status(err.statusCode).send({ message: err.message });
         }
+    }
+
+    private logout = (req: Request, res: Response) => {
+        req.logout();
+        console.log("user logout");
+        res.status(200).send({ message: "logout" })
     }
 }
 
