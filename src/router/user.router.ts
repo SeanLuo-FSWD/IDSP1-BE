@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import { auth } from 'firebase-admin';
 import AuthService from "../service/authentication.service";
 
 class UserRouter {
