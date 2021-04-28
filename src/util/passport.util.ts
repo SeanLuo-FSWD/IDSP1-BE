@@ -27,8 +27,8 @@ passport.serializeUser(function (user, done) {
     done(null, user.userId);
 });
 
-passport.deserializeUser(function (userId, done) {
-    let user = UserModel.getUserById(userId);
+passport.deserializeUser(async function (userId, done) {
+    let user = await UserModel.getUserById(userId);
     if (user) {
         done(null, user);
     } else {

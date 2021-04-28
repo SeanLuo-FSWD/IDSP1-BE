@@ -49,9 +49,12 @@ class UserModel {
         try {
             const usersCollection = database.collection("users");
             const userDoc = await usersCollection.doc(userId).get()
-            const user = userDoc.exists? userDoc.data : null;
+            const user = userDoc.exists? userDoc.data() : null;
 
-            return user;
+            return {
+                userId: user.userId,
+                email: user.email
+            }
         } catch(error) {
             throw new Error(error);
         }

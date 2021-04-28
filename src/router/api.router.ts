@@ -20,6 +20,7 @@ class APIRouter {
         })
         this.router.get(`${this.path}/authTest`, checkAuth, (req, res) => {
             console.log("passed auth");
+            console.log(req.user);
         })
     }
 }
