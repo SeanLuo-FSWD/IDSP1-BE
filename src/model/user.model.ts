@@ -30,11 +30,13 @@ class UserModel {
 
     public async create() {
         try {
+            const userId = this.usersCollection.doc().id;
             const passwordHash = await bcrypt.hash(this.password, this.saltRounds);
             
-            await this.usersCollection.add({
+            await this.usersCollection.doc(userId).set({
                 email: this.email,
-                password: passwordHash
+                password: passwordHash,
+                userId: userId
             })
 
             return { status: "success" };
@@ -43,9 +45,16 @@ class UserModel {
         }
     }
 
-    static generateAuthToken = (payload, jwtSecret) => {
-        const token = jwt.sign(payload, jwtSecret);
-        return token;
+    static async getUserById(userId: string) {
+        try {
+            const usersCollection = database.collection("users");
+            const userDoc = await usersCollection.doc(userId).get()
+            const user = userDoc.exists? userDoc.data : null;
+
+            return user;
+        } catch(error) {
+            throw new Error(error);
+        }
     }
 
     static async getByEmailAndPassword(email: string, password: string) {
@@ -62,12 +71,10 @@ class UserModel {
             const isMatch = await bcrypt.compare(password, user.password);
             
             if (isMatch) {
-                //issue jwt
-                const payload = {
-                    userId: "321"
-                }
+                //return user
                 return {
-                    token: this.generateAuthToken(payload, process.env.JWT_SECRET)
+                    email: user.email,
+                    userId: user.userId
                 }
             } else {
                 throw new Error("Email or password is incorrect.")
