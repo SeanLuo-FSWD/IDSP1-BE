@@ -1,19 +1,6 @@
 import { Request, Response, NextFunction, Router } from "express";
 import AuthService from "../service/authentication.service";
-import passport from "../util/passport.util";
 
-declare global {
-    namespace Express {
-        interface Request {
-            user: {
-                userId: string,
-                email: string
-            } //or other type you would like to use,
-            sessionID: string,
-            login: any
-        }
-    }
-}
 
 class UserRouter {
     public path = "/user";
@@ -31,7 +18,7 @@ class UserRouter {
 
     private signUp = async (req: Request, res: Response) => {
         try {
-            const result = await this._authService.signUp(req.body)
+            const result = await this._authService.signUp(req.body);
             
             if (result.status === "success") {
                 res.status(200).send(result);
@@ -47,14 +34,12 @@ class UserRouter {
     }
 
     private login = async (req: Request, res: Response, next: NextFunction) => {
-        passport.authenticate("local", function (err, user) {
-            if (err) return next(err);
-            if (!user) return res.status(400).send({ status: "error", message: "User not found." });
-            req.login(user, loginError => {
-                if (loginError) return next(loginError);
-                return res.status(200).send({ status: "success", message: "authenticated" });
-            })
-        })(req, res, next);
+        try {
+            const result = await this._authService.login(req, res, next);
+            res.status(result.statusCode).send({ message: result.message });
+        } catch(err) {
+            res.status(err.statusCode).send({ message: err.message });
+        }
     }
 }
 

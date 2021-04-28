@@ -10,15 +10,15 @@ const localLogin = new LocalStrategy(
     async (email, password, done) => {
         try {
             const user = await UserModel.getByEmailAndPassword(email, password);
+            console.log("auth", user);
             return user ?
                 done(null, user) : 
                 done(null, false, {
                     message: "Your login is invalid. Please try again"
                 });
         } catch(err) {
-            done(null, false, {
-                message: err
-            });
+            console.log("auth err", err);
+            done(err, false, );
         }
     }
 );
