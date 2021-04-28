@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 //routes
 import UserRouter from './user.router'
+import PostRouter from './post.router';
 
 import { checkAuth } from '../middleware/authentication.middleware';
 
@@ -10,6 +11,9 @@ class APIRouter {
     private subRouters = [
         new UserRouter()
     ];
+    private authedSubRouters = [
+        new PostRouter()
+    ]
     constructor() {
         this.initRouters();
     }
@@ -17,6 +21,9 @@ class APIRouter {
     private initRouters() {
         this.subRouters.forEach(subRoute => {
             this.router.use(`${this.path}`, subRoute.router);
+        })
+        this.authedSubRouters.forEach(subRoute => {
+            this.router.use(`${this.path}`, checkAuth, subRoute.router);
         })
         this.router.get(`${this.path}/authTest`, checkAuth, (req, res) => {
             console.log("passed auth");
