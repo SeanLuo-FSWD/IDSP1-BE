@@ -53,7 +53,8 @@ class UserModel {
 
             return {
                 userId: user.userId,
-                email: user.email
+                email: user.email,
+                username: user.username
             }
         } catch(error) {
             throw new Error(error);
@@ -77,7 +78,8 @@ class UserModel {
                 //return user
                 return {
                     email: user.email,
-                    userId: user.userId
+                    userId: user.userId,
+                    username: user.username
                 }
             } else {
                 throw new Error("Email or password is incorrect.")

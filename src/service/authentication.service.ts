@@ -17,7 +17,7 @@ declare global {
 }
 
 class AuthenticationService {
-    public login(req, res, next): Promise<{ statusCode: number, message: string}> {
+    public login(req, res, next): Promise<{ statusCode: number, message: string, userId: string, username: string}> {
         return new Promise((resolve, reject) => {
             console.log("auth promise");
             console.log(passport.Strategy);
@@ -28,7 +28,7 @@ class AuthenticationService {
                 //login is coded by passport, it writes the user information into session
                 req.login(user, loginError => {
                     if (loginError) reject({ statusCode: 500, message: "Login error."});
-                    resolve({ statusCode: 200, message: "authenticated" });
+                    resolve({ statusCode: 200, message: "success", userId: user.userId, username: user.username });
                 })
             })(req, res, next);
         })
