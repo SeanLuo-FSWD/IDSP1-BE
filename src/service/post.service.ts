@@ -20,9 +20,9 @@ class PostService {
         }
     }
 
-    public async deletePost(postId) {
+    public async deletePost(userId, postId) {
         try {
-            const result = PostModel.delete(postId);
+            const result = PostModel.delete(userId, postId);
             return result;
         } catch(err) {
             throw new Error(err);

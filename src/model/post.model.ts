@@ -41,13 +41,22 @@ class PostModel {
         }
     }
 
-    static async delete(postId) {
+    static async delete(userId, postId) {
         try {
             const postCollection = database.collection('post');
 
-            const result = await postCollection.doc(postId).delete();
-            console.log(result);
-            return result;
+            const doc = await postCollection.doc(postId).get();
+            
+            if (!doc.exists) throw new Error("Post not exists.");
+            const post = doc.data();
+            const postOwner = post.userId;
+            
+            if (postOwner === userId) {
+                const result = await postCollection.doc(postId).delete();
+                return result;
+            } else {
+                throw new Error("Unauthorized post deletion.");
+            }
         } catch(err) {
             throw new Error(err);
         }

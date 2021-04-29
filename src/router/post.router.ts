@@ -19,15 +19,15 @@ class PostRouter {
     private createPost = async (req: Request, res: Response) => {
         console.log("-- create post -- ");
         
-        // console.log(req.user);  
-        // const userId = req.user.userId;
-        // try {
-        //     const result = await this._postService.createPost(userId, req.body);
-        //     console.log(result);
-        //     res.status(200).send({ message: "success" });
-        // } catch(error) {
-        //     res.status(400).send({ message: error });
-        // }
+        console.log(req.user);  
+        const userId = req.user.userId;
+        try {
+            const result = await this._postService.createPost(userId, req.body);
+            console.log(result);
+            res.status(200).send({ message: "success" });
+        } catch(error) {
+            res.status(400).send({ message: error });
+        }
     }
 
     
@@ -51,14 +51,15 @@ class PostRouter {
     private deletePost = async (req: Request, res: Response, next: NextFunction) => {
         console.log("--- Delete Post ---")
         try {
+            const userId = req.user.userId;
             const postId = req.body.postId;
-            await this._postService.deletePost(postId);
-
+            await this._postService.deletePost(userId, postId);
+            res.status(200).send({ message: "success" })
         } catch(error) {
             console.log("error", error)
             res.status(400).send({
                 status: "error",
-                error: `${error}`
+                error: error
             })
         }
     }
