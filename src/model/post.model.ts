@@ -41,6 +41,18 @@ class PostModel {
         }
     }
 
+    static async delete(postId) {
+        try {
+            const postCollection = database.collection('post');
+
+            const result = await postCollection.doc(postId).delete();
+            console.log(result);
+            return result;
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+
     // public async deletePost(postId: string, userId: string) {
     //     try {
             

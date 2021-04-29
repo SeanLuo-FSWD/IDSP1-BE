@@ -19,6 +19,15 @@ class PostService {
             }
         }
     }
+
+    public async deletePost(postId) {
+        try {
+            const result = PostModel.delete(postId);
+            return result;
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
 }
 
 export default PostService;
