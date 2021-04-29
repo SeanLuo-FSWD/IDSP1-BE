@@ -13,6 +13,7 @@
 #### __Sign Up__
 
 Method & Path: __POST__ /api/user/signup
+
 Usage: Allow user to sign up and register a new account
 Request DataType:
 
