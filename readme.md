@@ -54,7 +54,7 @@ Response:
 
 ### Post API
 
-#### __reatePost__
+#### __createPost__
 
 Method & Path: __POST__ /api/post/
 Usage: Allow user to create a new post
