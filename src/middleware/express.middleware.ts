@@ -9,7 +9,11 @@ module.exports = (app) => {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     app.use(morgan("tiny"));
-    app.use(cors());
+    app.use(cors({
+      origin: true,
+      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+      credentials: true
+    }));
     app.use(
         session({
           secret: "secret",
