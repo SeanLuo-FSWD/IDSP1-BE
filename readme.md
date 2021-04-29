@@ -28,6 +28,7 @@ Response:
 #### __Log In__
 
 Method & Path: __POST__ /api/user/login
+
 Usage: Allow user to log in if account exists
 Request DataType:
 
@@ -44,6 +45,7 @@ Response:
 #### __Log Out__
 
 Method & Path: __GET__ /api/user/logout
+
 Usage: Allow user to log out if currently logged in
 Request DataType:
 
@@ -58,6 +60,7 @@ Response:
 #### __createPost__
 
 Method & Path: __POST__ /api/post/
+
 Usage: Allow user to create a new post
 Request DataType:
 
@@ -72,6 +75,7 @@ Response:
 #### __deletePost__
 
 Method & Path: __POST__ /api/post/
+
 Usage: Allow user to delete posts they own
 Request DataType:
 
