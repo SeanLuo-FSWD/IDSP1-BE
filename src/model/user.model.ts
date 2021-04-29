@@ -6,12 +6,16 @@ class UserModel {
     private _db = database;
     private email: string;
     private password: string;
+    private _profilePhoto: string;
+    private username: string;
     private saltRounds: number = 10;
     private usersCollection = this._db.collection("users");
     
     constructor(input) {
         this.email = input.email;
         this.password = input.password;
+        this.username = input.username;
+        this._profilePhoto = "https://res.cloudinary.com/depk87ok3/image/upload/v1619723749/defaultProfilePhoto-min_zdwber.png";
     }
 
     public async isExisted() {
@@ -36,6 +40,8 @@ class UserModel {
             await this.usersCollection.doc(userId).set({
                 email: this.email,
                 password: passwordHash,
+                username: this.username,
+                profilePhoto: this._profilePhoto,
                 userId: userId
             })
 
