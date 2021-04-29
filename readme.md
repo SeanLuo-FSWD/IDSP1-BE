@@ -1,4 +1,4 @@
-# API Documnetation
+# API Documentation
 
 [Firebase Documentation](https://firebase.google.com/docs/firestore/)
 
