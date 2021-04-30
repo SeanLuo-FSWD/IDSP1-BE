@@ -10,7 +10,7 @@ module.exports = (app) => {
     app.use(express.json());
     app.use(morgan("tiny"));
     app.use(cors({
-      origin: true,
+      origin: "http://idsp-townsquare.herokuapp.com",
       methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
       credentials: true
     }));

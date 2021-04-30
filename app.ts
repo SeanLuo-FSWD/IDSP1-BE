@@ -5,7 +5,7 @@ import APIRouter from './src/router/api.router';
 
 class App {
     private _app: express.Application;
-    private readonly _port: number | string = process.env.PORT || 8000;
+    private readonly _port;
     private apiRouter = new APIRouter();
     
     constructor() {
@@ -13,6 +13,8 @@ class App {
         dotenv.config();
         this.initializeMiddleWares();
         this.initAPIRouter();
+        console.log(process.env.PORT);
+        this._port = process.env.PORT || 8000;
     }
 
     public startServer() {
