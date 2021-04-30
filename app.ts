@@ -29,8 +29,8 @@ class App {
 
     public initAPIRouter() {
         this._app.use("/", this.apiRouter.router);
-        this._app.get("/ec2", (req,res) => {
-            res.send("ec2 test");
+        this._app.get("/", (req,res) => {
+            console.log("app.get");
         })
     }
 
