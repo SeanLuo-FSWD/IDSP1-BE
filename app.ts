@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
 
 import APIRouter from './src/router/api.router';
 
@@ -29,9 +30,11 @@ class App {
 
     public initAPIRouter() {
         this._app.use("/", this.apiRouter.router);
-        this._app.get("/", (req,res) => {
-            console.log("app.get");
-            res.send("app get");
+    }
+
+    public initHostingReactUI() {
+        this._app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname + '/public/index.html'))
         })
     }
 
