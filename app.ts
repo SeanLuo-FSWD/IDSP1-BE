@@ -31,6 +31,7 @@ class App {
         this._app.use("/", this.apiRouter.router);
         this._app.get("/", (req,res) => {
             console.log("app.get");
+            res.send("app get");
         })
     }
 
