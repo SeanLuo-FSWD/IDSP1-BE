@@ -1,6 +1,6 @@
 import database from "../util/database.util";
 
-class CommmentModel {
+class CommentModel {
     private _db = database;
     private _commentCollection = this._db.collection("comment");
     private _timeStamp: string;
@@ -35,7 +35,7 @@ class CommmentModel {
             }
 
         } catch(err) {
-            return {
+            throw {
                 status: 500,
                 message: "Error when inserting comment into database."
             }
@@ -46,3 +46,5 @@ class CommmentModel {
         
     }
 }
+
+export default CommentModel;
