@@ -1,11 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
 
 import APIRouter from './src/router/api.router';
 
 class App {
     private _app: express.Application;
-    private readonly _port: number | string = process.env.PORT || 8000;
+    private readonly _port;
     private apiRouter = new APIRouter();
     
     constructor() {
@@ -13,6 +14,8 @@ class App {
         dotenv.config();
         this.initializeMiddleWares();
         this.initAPIRouter();
+        console.log(process.env.PORT);
+        this._port = process.env.PORT || 8000;
     }
 
     public startServer() {
@@ -27,6 +30,12 @@ class App {
 
     public initAPIRouter() {
         this._app.use("/", this.apiRouter.router);
+    }
+
+    public initHostingReactUI() {
+        this._app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname + '/public/index.html'))
+        })
     }
 
     get app() {

@@ -22,9 +22,13 @@ class APIRouter {
         this.subRouters.forEach(subRoute => {
             this.router.use(`${this.path}`, subRoute.router);
         })
+        // this.authedSubRouters.forEach(subRoute => {
+        //     //need to enable checkAuth as middleware later
+        //     this.router.use(`${this.path}`, checkAuth, subRoute.router);
+        // })
         this.authedSubRouters.forEach(subRoute => {
             //need to enable checkAuth as middleware later
-            this.router.use(`${this.path}`, checkAuth, subRoute.router);
+            this.router.use(`${this.path}`, subRoute.router);
         })
         this.router.get(`${this.path}/authTest`, checkAuth, (req, res) => {
             console.log("passed auth");
