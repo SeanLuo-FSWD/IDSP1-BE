@@ -6,7 +6,7 @@ class ImageModel {
     private _bucket: string = "idsp2";
     private _key;
     private _body;
-    
+
     constructor(name, body) {
         this._key = "images/"+`${Date.now()}`+ "_" + path.basename(name);
         this._body = body;

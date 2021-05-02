@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn server.ts",
+    "deploy": "sh deploy.sh",
     "testLogin": "npx jest ./testing/login.test.js",
     "testSignup": "npx jest ./testing/signup.test.ts"
   },

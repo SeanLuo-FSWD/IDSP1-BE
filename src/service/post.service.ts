@@ -1,13 +1,19 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import PostModel from "../model/post.model";
+import ImageModel from "../model/image.model";
 
 class PostService {
-    public async createPost(userId, postData) {
+    public async createPost(userId, req) {
+        console.log("req.files", req.files);
         try {
-            const postContent = new PostModel(userId, postData);
-            console.log(postContent);
-            await postContent.createPost();
+            const postData = req.body;
+            const imagesUploadResult = await Promise.all(req.files.map(file => new ImageModel(file.originalname, file.buffer).upload()));
+            console.log("images", imagesUploadResult);
+
+            // const postContent = new PostModel(userId, postData);
+            // console.log(postContent);
+            // await postContent.createPost();
             
             return {
                 status: "success"
