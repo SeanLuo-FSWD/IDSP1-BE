@@ -6,6 +6,7 @@ class PostModel {
     private _db = database;
     private userId: string;
     private timeStamp: string;
+    private _title: string;
     private text: string;
     private images: string[];
     private postCollection = this._db.collection("posts");
@@ -13,6 +14,7 @@ class PostModel {
     constructor(userId: string, input) {
         this.userId = userId;
         this.timeStamp = new Date().toString();
+        this._title = input.title;
         this.text = input.text;
         this.images = input.images;//[] for no images,
     }
@@ -20,7 +22,7 @@ class PostModel {
     public async createPost() {
         try {
             const postId = this.postCollection.doc().id;
-
+            console.log(postId, this.userId);
             const newPost = {
                 postId: postId,
                 userId: this.userId,
@@ -29,7 +31,9 @@ class PostModel {
                 images: this.images
             }
 
-            const result = await database.collection('post').doc(postId).set(newPost)
+            console.log("new post", newPost);
+
+            const result = await this.postCollection.doc(postId).set(newPost)
 
             console.log(result);
 

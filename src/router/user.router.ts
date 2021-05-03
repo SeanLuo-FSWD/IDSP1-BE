@@ -45,6 +45,7 @@ class UserRouter {
     private login = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const result = await this._authService.login(req, res, next);
+            console.log(result);
             res.status(result.statusCode).send({ message: result.message, userId: result.userId, username: result.username});
         } catch(err) {
             res.status(err.statusCode).send({ message: err.message });

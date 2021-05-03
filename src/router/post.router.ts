@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import PostService from "../service/post.service";
+import multerUpload from "../middleware/multerUpload.middleware";
 
 class PostRouter {
     // /api/post
@@ -12,7 +13,7 @@ class PostRouter {
     }
 
     private initializeRoutes() {
-        this.router.post(`${this.path}`, this.createPost);
+        this.router.post(`${this.path}`, multerUpload.array("filesToUpload[]"), this.createPost);
         this.router.post(`${this.path}/delete`, this.deletePost);
     }
 
@@ -22,7 +23,7 @@ class PostRouter {
         console.log(req.user);  
         const userId = req.user.userId;
         try {
-            const result = await this._postService.createPost(userId, req.body);
+            const result = await this._postService.createPost(userId, req);
             console.log(result);
             res.status(200).send({ message: "success" });
         } catch(error) {
