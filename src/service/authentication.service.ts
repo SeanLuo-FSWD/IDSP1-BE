@@ -59,6 +59,28 @@ class AuthenticationService {
             }
         }
     };
+
+    public async verifyEmail(userId) {
+        try {
+            const user = await UserModel.getUserById(userId);
+            console.log(user);
+            if (user) {
+                const result = await UserModel.verifyUserByEmail(userId);
+                return result;
+            } else {
+                return {
+                    status: 404,
+                    message: "User not found."
+                }
+            }
+        } catch(err) {
+            return {
+                status: 500,
+                message: "Failed connecting to database."
+            }
+        }
+
+    }
 }
 
 export default AuthenticationService;

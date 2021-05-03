@@ -8,6 +8,7 @@ class UserModel {
     private password: string;
     private _profilePhoto: string;
     private username: string;
+    private _emailVerified: boolean;
     private saltRounds: number = 10;
     private usersCollection = this._db.collection("users");
     
@@ -15,6 +16,7 @@ class UserModel {
         this.email = input.email;
         this.password = input.password;
         this.username = input.username;
+        this._emailVerified = false;
         this._profilePhoto = "https://res.cloudinary.com/depk87ok3/image/upload/v1619723749/defaultProfilePhoto-min_zdwber.png";
     }
 
@@ -55,14 +57,16 @@ class UserModel {
         try {
             const usersCollection = database.collection("users");
             const userDoc = await usersCollection.doc(userId).get()
-            const user = userDoc.exists? userDoc.data() : null;
-
-            return {
-                userId: user.userId,
-                email: user.email,
-                username: user.username
-            }
+            const user = userDoc.exists? 
+                {
+                    userId: userDoc.data().userId,
+                    email: userDoc.data().email,
+                    username: userDoc.data().username
+                }
+                : null;
+            return user;
         } catch(error) {
+            console.log("error");
             throw new Error(error);
         }
     }
@@ -92,6 +96,23 @@ class UserModel {
             }
         } catch(error) {
             throw new Error(error);
+        }
+    }
+
+    static async verifyUserByEmail(userId) {
+        try {
+            database.collection("users").doc(userId).update({
+                emailVerified: true
+            });
+            return {
+                status: 200,
+                message: "success"
+            }
+        } catch(err) {
+            return {
+                status: 500,
+                message: "Failed updating to verify user email."
+            }
         }
     }
 }

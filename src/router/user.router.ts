@@ -23,6 +23,7 @@ class UserRouter {
         this.router.post(`${this.path}/signUp`, this.signUp);
         this.router.post(`${this.path}/login`, this.login);
         this.router.get(`${this.path}/logout`, this.logout);
+        this.router.get(`${this.path}/verify`, this.verifyEmail)
     }
 
     private signUp = async (req: Request, res: Response) => {
@@ -56,6 +57,18 @@ class UserRouter {
         req.logout();
         console.log("user logout");
         res.status(200).send({ message: "logout" })
+    }
+
+    private verifyEmail = async (req: Request, res: Response) => {
+        try {
+            console.log("--- email verification ---");
+            const userId = req.query.id;
+            console.log(userId);
+            const result = await this._authService.verifyEmail(userId);
+            res.status(result.status).send({ message: result.message });
+        } catch(err) {
+            res.status(400).send({ message: "Bad Request." })
+        }
     }
 }
 
