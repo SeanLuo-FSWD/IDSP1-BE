@@ -17,7 +17,7 @@ class ImageModel {
             const uploadParams = {
                 Bucket: this._bucket,
                 Key: this._key,
-                Body: this._body
+                Body: this._body,
             }
             const data = await s3.send(new PutObjectCommand(uploadParams));
             const s3domain = "https://idsp2.s3-us-west-1.amazonaws.com";
