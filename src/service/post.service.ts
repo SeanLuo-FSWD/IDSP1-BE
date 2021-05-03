@@ -8,14 +8,22 @@ class PostService {
         console.log("req.files", req.files);
         try {
             const postData = req.body;
-            // const result = await new ImageModel(req.files[0].originalname, req.files[0].buffer).upload();
-            const result = await Promise.all([new ImageModel(req.files[0].originalname, req.files[0].buffer).upload(), new ImageModel(req.files[1].originalname, req.files[1].buffer).upload()]);
             
-            console.log("images", result);
+            let imagesUploadResult = [];
+            if (req.files.length) {
+                const imagesUploadArr = req.files.map(async file => await new ImageModel(file.originalname, file.buffer).upload());
+                imagesUploadResult = await Promise.all(imagesUploadArr)
+            }
+            
+            console.log("images", imagesUploadResult);
 
-            // const postContent = new PostModel(userId, postData);
-            // console.log(postContent);
-            // await postContent.createPost();
+            postData.images = imagesUploadResult.length?
+                imagesUploadResult.map((imageInfo: { status: string, imageUrl: string }) => imageInfo.imageUrl) :
+                [];
+
+            const postContent = new PostModel(userId, postData);
+            console.log(postContent);
+            await postContent.createPost();
             
             return {
                 status: "success"
