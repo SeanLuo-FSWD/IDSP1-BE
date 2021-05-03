@@ -39,15 +39,23 @@ class UserModel {
             const userId = this.usersCollection.doc().id;
             const passwordHash = await bcrypt.hash(this.password, this.saltRounds);
             
-            await this.usersCollection.doc(userId).set({
+            const result = await this.usersCollection.doc(userId).set({
                 email: this.email,
                 password: passwordHash,
                 username: this.username,
                 profilePhoto: this._profilePhoto,
-                userId: userId
+                userId: userId,
+                emailVerified: this._emailVerified
             })
 
-            return { status: "success" };
+            console.log("result",result);
+
+            return { 
+                status: 200,
+                email: this.email,
+                username: this.username,
+                userId: userId
+            };
         } catch(error) {
             throw new Error(error);
         }
@@ -89,7 +97,8 @@ class UserModel {
                 return {
                     email: user.email,
                     userId: user.userId,
-                    username: user.username
+                    username: user.username,
+                    emailVerified: user.emailVerified
                 }
             } else {
                 throw new Error("Email or password is incorrect.")

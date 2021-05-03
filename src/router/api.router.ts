@@ -5,6 +5,8 @@ import PostRouter from './post.router';
 
 import { checkAuth } from '../middleware/authentication.middleware';
 
+import initNodemailer from '../util/nodemailer.util';
+
 class APIRouter {
     public router = Router();
     public path = "/api";
@@ -22,6 +24,9 @@ class APIRouter {
         this.subRouters.forEach(subRoute => {
             this.router.use(`${this.path}`, subRoute.router);
         })
+        this.router.get(`${this.path}/emailTest`, async (req, res) => {
+            console.log('email verify');
+        })
         this.authedSubRouters.forEach(subRoute => {
             //need to enable checkAuth as middleware later
             this.router.use(`${this.path}`, checkAuth, subRoute.router);
@@ -30,6 +35,7 @@ class APIRouter {
             console.log("passed auth");
             console.log(req.user);
         })
+
     }
 }
 

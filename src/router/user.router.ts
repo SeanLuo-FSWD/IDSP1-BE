@@ -29,17 +29,18 @@ class UserRouter {
     private signUp = async (req: Request, res: Response) => {
         try {
             const result = await this._authService.signUp(req.body);
-            
-            if (result.status === "success") {
-                res.status(200).send(result);
+            if (result.status === 200) {
+                res.status(200).send({ message: "success" })
             } else {
-                throw new Error(result.error);
+                throw {
+                    status: result.status,
+                    message: result.message
+                }
             }
+            res.status(result.status).send({ message: "success" })
         } catch(error) {
-            res.status(400).send({
-                status: "error",
-                error: `${error}`
-            })
+            console.log(error);
+            res.status(error.status).send({ message: error.message })
         }
     }
 
