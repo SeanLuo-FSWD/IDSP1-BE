@@ -6,7 +6,6 @@ class PostModel {
     private _db = database;
     private userId: string;
     private timeStamp: string;
-    private _title: string;
     private text: string;
     private images: string[];
     private postCollection = this._db.collection("posts");
@@ -14,7 +13,6 @@ class PostModel {
     constructor(userId: string, input) {
         this.userId = userId;
         this.timeStamp = new Date().toString();
-        this._title = input.title;
         this.text = input.text;
         this.images = input.images;//[] for no images,
     }
