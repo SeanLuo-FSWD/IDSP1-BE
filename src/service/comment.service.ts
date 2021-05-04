@@ -9,10 +9,29 @@ class CommentService {
             if (result.status === 200) {
                 return result;
             } else {
-                throw new Error();
+                throw {
+                    status: 500,
+                    message: "Failed to insert comment into database."
+                }
             }
         } catch(err) {
             return err
+        }
+    }
+
+    public async getCommentsByPostId(postId) {
+        try {
+            const result = await CommentModel.getAllCommentsByPostId(postId);
+
+            return {
+                status: result.status,
+                comments: result.comments
+            }
+        } catch(err) {
+            throw {
+                status: 500,
+                message: "SERVICE: Failed to get all comments by post id."
+            }
         }
     }
 }
