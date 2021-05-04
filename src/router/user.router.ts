@@ -23,22 +23,24 @@ class UserRouter {
         this.router.post(`${this.path}/signUp`, this.signUp);
         this.router.post(`${this.path}/login`, this.login);
         this.router.get(`${this.path}/logout`, this.logout);
+        this.router.get(`${this.path}/verify`, this.verifyEmail)
     }
 
     private signUp = async (req: Request, res: Response) => {
         try {
             const result = await this._authService.signUp(req.body);
-            
-            if (result.status === "success") {
-                res.status(200).send(result);
+            if (result.status === 200) {
+                res.status(200).send({ message: "success" })
             } else {
-                throw new Error(result.error);
+                throw {
+                    status: result.status,
+                    message: result.message
+                }
             }
+            res.status(result.status).send({ message: "success" })
         } catch(error) {
-            res.status(400).send({
-                status: "error",
-                error: `${error}`
-            })
+            console.log(error);
+            res.status(error.status).send({ message: error.message })
         }
     }
 
@@ -56,6 +58,18 @@ class UserRouter {
         req.logout();
         console.log("user logout");
         res.status(200).send({ message: "logout" })
+    }
+
+    private verifyEmail = async (req: Request, res: Response) => {
+        try {
+            console.log("--- email verification ---");
+            const userId = req.query.id;
+            console.log(userId);
+            const result = await this._authService.verifyEmail(userId);
+            res.status(result.status).send({ message: result.message });
+        } catch(err) {
+            res.status(400).send({ message: "Bad Request." })
+        }
     }
 }
 
