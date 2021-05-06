@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 
+import { connectDB } from "./src/util/database.util";
+
 import APIRouter from './src/router/api.router';
 
 class App {
@@ -19,7 +21,9 @@ class App {
     }
 
     public startServer() {
-        this._app.listen(this._port , () => {
+        
+        this._app.listen(this._port , async () => {
+            await connectDB();
             console.log(`App listening on ${this._port}.`)
         })
     }

@@ -1,20 +1,22 @@
-import database from "../util/database.util";
+import { getDB } from "../util/database.util";
 import bcrypt from "bcrypt";
 // import jwt from "jsonwebtoken";
 
 class PostModel {
-    private _db = database;
     private userId: string;
     private timeStamp: string;
     private text: string;
     private images: string[];
+    private _likesCount: number;
+    private _db = getDB();
     private postCollection = this._db.collection("posts");
     
     constructor(userId: string, input) {
         this.userId = userId;
         this.timeStamp = new Date().toString();
         this.text = input.text;
-        this.images = input.images;//[] for no images,
+        this.images = input.images;//[] for no images,  
+        this._likesCount = 0;
     }
 
     public async createPost() {
@@ -26,7 +28,8 @@ class PostModel {
                 userId: this.userId,
                 timeStamp: this.timeStamp,
                 text: this.text,
-                images: this.images
+                images: this.images,
+                likesCount: this._likesCount
             }
 
             console.log("new post", newPost);
@@ -61,6 +64,14 @@ class PostModel {
             }
         } catch(err) {
             throw new Error(err);
+        }
+    }
+
+    static async updatePostLike(postId, likesArray) {
+        try {
+            const result = await this._postCollection
+        } catch(err) {
+            console.log(err);
         }
     }
 

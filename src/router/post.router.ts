@@ -2,6 +2,19 @@ import { Request, Response, NextFunction, Router } from 'express';
 import PostService from "../service/post.service";
 import multerUpload from "../middleware/multerUpload.middleware";
 
+declare global {
+    namespace Express {
+        interface Request {
+            user: {
+                userId: string,
+                email: string
+            } //or other type you would like to use,
+            sessionID: string,
+            login: any
+        }
+    }
+}
+
 class PostRouter {
     // /api/post
     public path = "/post"
@@ -30,24 +43,6 @@ class PostRouter {
             res.status(400).send({ message: error });
         }
     }
-
-    
-    // private getPostFeed = async (req: Request, res: Response) => {
-    //     try {
-    //         const result = await this._postService.getPostFeed(req.body)
-            
-    //         if (result.status === "success") {
-    //             res.status(200).send(result);
-    //         } else {
-    //             throw new Error(result.error);
-    //         }
-    //     } catch(error) {
-    //         res.status(400).send({
-    //             status: "error",
-    //             error: `${error}`
-    //         })
-    //     }
-    // }
 
     private deletePost = async (req: Request, res: Response, next: NextFunction) => {
         console.log("--- Delete Post ---")
