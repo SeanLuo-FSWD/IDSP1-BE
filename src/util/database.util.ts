@@ -1,13 +1,26 @@
-import * as admin from "firebase-admin";
+import { MongoClient } from "mongodb";
 
-import serviceAccount from "../../idsp2-667df-firebase-adminsdk-lq46s-e610ba03d2.json";
+const uri = "const url = 'mongodb://127.0.0.1:27017'";
 
-const account = serviceAccount as admin.ServiceAccount;
-
-admin.initializeApp({
-    credential: admin.credential.cert(account),
+const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
+let _database;
+
+async function connectDB() {
+    await client.connect();
+    _database = client.db("townsquare");
+}
+
+function getDB () {
+    return _database; 
+}
+
+function _attr() {
+    return 123;
+}
 
 
-export default admin.firestore();
+export { connectDB, getDB, _attr};

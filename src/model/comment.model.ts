@@ -1,37 +1,37 @@
-import database from "../util/database.util";
+import { getDB } from "../util/database.util";
 
 class CommentModel {
-    private _db = database;
-    private _commentCollection = this._db.collection("comment");
+    private _db = getDB();
+    private static _db = getDB();
     private _createdAt: string;
-    public text: string;
+    private _text: string;
     private _commentId: string;
     private _userId: string;
     private _postId: string;
-    private static _commentCollection = database.collection("comment");
 
     constructor(userId, input) {
         this._createdAt = new Date().toString();
-        this.text = input.text;
+        this._text = input.text;
         this._userId = userId;
         this._postId = input.postId;
     }
 
     async create() {
         try {
-            const commentId = this._commentCollection.doc().id;
             const newComment = {
-                commentId,
-                text: this.text,
+                text: this._text,
                 userId: this._userId,
                 postId: this._postId,
                 createdAt: this._createdAt
             }
-            const result = await this._commentCollection.doc(commentId).set(newComment);
+            const result = await this._db.collection("comment").insertOne(newComment);
             console.log(result);
             return {
                 status: 200,
-                comment: newComment
+                comment: {
+                    commentId: result.insertedId,
+                    ...newComment
+                }
             }
 
         } catch(err) {
@@ -44,11 +44,9 @@ class CommentModel {
 
     static async getAllCommentsByPostId(postId) {
         try {
-            let comments = [];
-            const result = await this._commentCollection.where("postId", "==", postId).get();
-            if (!result.empty) {
-                result.forEach(doc => comments.push(doc.data()));
-            }
+            const database = getDB();
+            const comments = await database.collection("comment").find({ postId }).toArray();
+
             console.log(comments);
             return {
                 status: 200,

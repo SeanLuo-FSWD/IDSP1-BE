@@ -37,7 +37,6 @@ class UserRouter {
                     message: result.message
                 }
             }
-            res.status(result.status).send({ message: "success" })
         } catch(error) {
             console.log(error);
             res.status(error.status).send({ message: error.message })

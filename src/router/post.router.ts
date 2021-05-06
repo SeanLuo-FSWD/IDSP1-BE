@@ -2,6 +2,19 @@ import { Request, Response, NextFunction, Router } from 'express';
 import PostService from "../service/post.service";
 import multerUpload from "../middleware/multerUpload.middleware";
 
+declare global {
+    namespace Express {
+        interface Request {
+            user: {
+                userId: string,
+                email: string
+            } //or other type you would like to use,
+            sessionID: string,
+            login: any
+        }
+    }
+}
+
 class PostRouter {
     // /api/post
     public path = "/post"
@@ -15,6 +28,7 @@ class PostRouter {
     private initializeRoutes() {
         this.router.post(`${this.path}`, multerUpload.array("filesToUpload[]"), this.createPost);
         this.router.post(`${this.path}/delete`, this.deletePost);
+        this.router.post(`${this.path}/like`, this.toggleLikePost)
     }
 
     private createPost = async (req: Request, res: Response) => {
@@ -31,37 +45,29 @@ class PostRouter {
         }
     }
 
-    
-    // private getPostFeed = async (req: Request, res: Response) => {
-    //     try {
-    //         const result = await this._postService.getPostFeed(req.body)
-            
-    //         if (result.status === "success") {
-    //             res.status(200).send(result);
-    //         } else {
-    //             throw new Error(result.error);
-    //         }
-    //     } catch(error) {
-    //         res.status(400).send({
-    //             status: "error",
-    //             error: `${error}`
-    //         })
-    //     }
-    // }
-
     private deletePost = async (req: Request, res: Response, next: NextFunction) => {
         console.log("--- Delete Post ---")
         try {
             const userId = req.user.userId;
             const postId = req.body.postId;
+            console.log("delete post router: postId ", postId);
             await this._postService.deletePost(userId, postId);
             res.status(200).send({ message: "success" })
         } catch(error) {
             console.log("error", error)
-            res.status(400).send({
-                status: "error",
-                error: error
-            })
+            res.status(error.status).send({ message: error.message });
+        }
+    }
+
+    private toggleLikePost = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const postId = req.body.postId;
+            const result = await PostService.toggleLikePost(userId, postId);
+            res.status(result.status).send({ message: result.message });
+        } catch(error) {
+            console.log("router: ", error);
+            res.status(error.status).send({ message: error.message });
         }
     }
 }
