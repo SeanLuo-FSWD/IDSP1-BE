@@ -10,8 +10,6 @@ class UserModel {
     private _username: string;
     private _emailVerified: boolean;
     private saltRounds: number = 10;
-
-    private static _db = getDB();
     
     constructor(input) {
         this._email = input.email;
@@ -63,11 +61,11 @@ class UserModel {
 
     static async getUserById(userId: string) {
         try {
-            const _id = new ObjectId(userId);
-            const user = await this._db.collection("user").findOne({ _id });
+            const database = getDB();
+            const user = await database.collection("user").findOne({ _id: new ObjectId(userId) });
             if (user) {
                return {
-                    userId: _id,
+                    userId,
                     email: user.email,
                     username: user.username
                }
@@ -89,8 +87,9 @@ class UserModel {
     static async getByEmailAndPassword(email: string, password: string) {
         console.log("getByEmail&password: ", email);
         try {
-            const user = await this._db.collection("user").findOne({"email": email})
-            
+            const database = getDB();
+            const user = await database.collection("user").findOne({ email });
+            console.log("getByEmail&password user: ", user)
             if (!user) throw new Error("User doesn't exist.");
 
             const isMatch = await bcrypt.compare(password, user.password);
@@ -119,11 +118,13 @@ class UserModel {
 
     static async verifyUserByEmail(userId) {
         try {
-            const _id = new ObjectId(userId);
-            const query = { _id };
-            this._db.collection("user").updateOne(query, {
+            const database = getDB();
+            const query = { _id: new ObjectId(userId) };
+            const result = await database.collection("user").updateOne(query, { $set: {
                 emailVerified: true
-            });
+            }});
+
+            console.log("result", result);
             return {
                 status: 200,
                 message: "success"

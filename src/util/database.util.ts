@@ -14,10 +14,13 @@ async function connectDB() {
     _database = client.db("townsquare");
 }
 
-
 function getDB () {
     return _database; 
 }
 
+function _attr() {
+    return 123;
+}
 
-export { connectDB, getDB};
+
+export { connectDB, getDB, _attr};

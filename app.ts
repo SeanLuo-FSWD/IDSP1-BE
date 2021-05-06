@@ -20,10 +20,9 @@ class App {
         this._port = process.env.PORT || 8000;
     }
 
-    public startServer() {
-        
-        this._app.listen(this._port , async () => {
-            await connectDB();
+    public async startServer() {
+        await connectDB();
+        this._app.listen(this._port , () => {
             console.log(`App listening on ${this._port}.`)
         })
     }

@@ -1,77 +1,114 @@
 import { getDB } from "../util/database.util";
-import bcrypt from "bcrypt";
-// import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 class PostModel {
-    private userId: string;
-    private timeStamp: string;
-    private text: string;
-    private images: string[];
+    private _userId: string;
+    private _createdAt: string;
+    private _text: string;
+    private _images: string[];
     private _likesCount: number;
     private _db = getDB();
-    private postCollection = this._db.collection("posts");
     
     constructor(userId: string, input) {
-        this.userId = userId;
-        this.timeStamp = new Date().toString();
-        this.text = input.text;
-        this.images = input.images;//[] for no images,  
+        this._userId = userId;
+        this._createdAt = new Date().toString();
+        this._text = input.text;
+        this._images = input.images;//[] for no images,  
         this._likesCount = 0;
     }
 
-    public async createPost() {
+    public async create() {
         try {
-            const postId = this.postCollection.doc().id;
-            console.log(postId, this.userId);
             const newPost = {
-                postId: postId,
-                userId: this.userId,
-                timeStamp: this.timeStamp,
-                text: this.text,
-                images: this.images,
+                userId: this._userId,
+                createdAt: this._createdAt,
+                text: this._text,
+                images: this._images,
                 likesCount: this._likesCount
             }
 
-            console.log("new post", newPost);
-
-            const result = await this.postCollection.doc(postId).set(newPost)
-
-            console.log(result);
+            const result = await this._db.collection("post").insertOne(newPost);
 
             //Figure out what to return here
-            return { status: "success" };
+            return {
+                status: 200,
+                postId: result.insertedId,
+                ...newPost
+            };
 
         } catch(error) {
-            throw new Error(error);
+            throw {
+                status: 500,
+                message: "Failed to insert post to the database."
+            }
         }
     }
 
     static async delete(userId, postId) {
         try {
-            const postCollection = database.collection('post');
-
-            const doc = await postCollection.doc(postId).get();
-            
-            if (!doc.exists) throw new Error("Post not exists.");
-            const post = doc.data();
-            const postOwner = post.userId;
-            
-            if (postOwner === userId) {
-                const result = await postCollection.doc(postId).delete();
-                return result;
-            } else {
-                throw new Error("Unauthorized post deletion.");
+            const database = getDB();
+            const result = await database.collection("post").findOne({ _id: new ObjectId(postId) });
+            console.log(result);
+            if (!result) throw {
+                status: 404,
+                message: "Post not found."
             }
-        } catch(err) {
-            throw new Error(err);
+            console.log("post found");
+            console.log(result.userId, userId);
+            if (result.userId.toString() !== userId.toString()) throw {
+                status: 403, 
+                message: "Unauthorized."
+            }
+            console.log("ready to delete post");
+            await database.collection("post").deleteOne({ _id: new ObjectId(postId) });
+            return {
+                status: 200,
+                message: "success"
+            }
+        } catch(error) {
+            console.log("post model delete post error", error);
+            throw error;
         }
     }
 
-    static async updatePostLike(postId, likesArray) {
+    static async togglePostLike(userId, postId) {
         try {
-            const result = await this._postCollection
+            const database = getDB();
+            const isLiked = await database.collection("like").findOne({ postId, userId });
+            if (isLiked) {
+                await database.collection("like").deleteOne({ postId, userId });
+                await database.collection("post").updateOne({ _id: new ObjectId(postId) }, { $inc: { likesCount: -1 } });
+                return {
+                    status: 200,
+                    message: "unliked"
+                }   
+            } else {
+                await database.collection("like").insertOne({ postId, userId });
+                await database.collection("post").updateOne({ _id: new ObjectId(postId) }, { $inc: { likesCount: 1 } });
+                return {
+                    status: 200,
+                    message: "liked"
+                }
+            }
         } catch(err) {
-            console.log(err);
+            throw {
+                status: 500,
+                message: "Failed toggle like on the post."
+            }
+        }
+    }
+
+    static getPostByPostId = async (postId: string) => {
+        try {
+            const database = getDB();
+            const post = await database.collection("post").findOne({ _id: new ObjectId(postId) });
+            if (!post) throw { status: 404, message: "Post not found." };
+            return {
+                status: 200,
+                post
+            }
+        } catch(error) {
+            throw error;
         }
     }
 

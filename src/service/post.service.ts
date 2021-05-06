@@ -1,5 +1,3 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import PostModel from "../model/post.model";
 import ImageModel from "../model/image.model";
 
@@ -23,7 +21,7 @@ class PostService {
 
             const postContent = new PostModel(userId, postData);
             console.log(postContent);
-            await postContent.createPost();
+            await postContent.create();
             
             return {
                 status: "success"
@@ -41,7 +39,22 @@ class PostService {
             const result = PostModel.delete(userId, postId);
             return result;
         } catch(err) {
-            throw new Error(err);
+            console.log("service", err);
+            throw err;
+        }
+    }
+
+    static async toggleLikePost(userId, postId) {
+        try {
+            const result = await PostModel.togglePostLike(userId, postId);
+            console.log("---POST SERVICE: toggleLikePost result", result);
+            return result;
+        } catch(err) {
+
+            throw {
+                status: 400,
+                message: "Failed to invoke model method."
+            }
         }
     }
 }
