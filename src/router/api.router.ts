@@ -5,7 +5,7 @@ import PostRouter from './post.router';
 import CommentRouter from "../router/comment.router";
 
 import { checkAuth } from '../middleware/authentication.middleware';
-
+import errorHandlingMiddleware from "../middleware/errorHandling.middleware";
 import initNodemailer from '../util/nodemailer.util';
 
 class APIRouter {
@@ -24,18 +24,11 @@ class APIRouter {
 
     private initRouters() {
         this.subRouters.forEach(subRoute => {
-            this.router.use(`${this.path}`, subRoute.router);
-        })
-        this.router.get(`${this.path}/emailTest`, async (req, res) => {
-            console.log('email verify');
-        })
+            this.router.use(`${subRoute.path}`, subRoute.router);
+        });
         this.authedSubRouters.forEach(subRoute => {
-            this.router.use(`${this.path}`, checkAuth, subRoute.router);
-        })
-        // this.router.get(`${this.path}/authTest`, checkAuth, (req, res) => {
-        //     console.log("passed auth");
-        //     console.log(req.user);
-        // })
+            this.router.use(`${subRoute.path}`, checkAuth, subRoute.router);
+        });
     }
 }
 

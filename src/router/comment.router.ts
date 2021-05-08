@@ -11,8 +11,8 @@ class CommentRouter {
     }
 
     private initializeRoutes() {
-        this.router.post(`${this.path}`, this.createComment);
-        this.router.get(`${this.path}`, this.getCommentByPostId);
+        this.router.post(`/`, this.createComment);
+        this.router.get(`/`, this.getCommentByPostId);
     }
 
     private createComment = async (req: Request, res: Response, next: NextFunction) => {
@@ -22,12 +22,9 @@ class CommentRouter {
             console.log("--- create comment ---");
             const result = await this._commentService.createComment(userId, commentBody);
             console.log("result", result);
-            res.status(result.status).send({...result.comment});
-        } catch(err) {
-            console.log(err);
-            res.status(400).send({
-                message: err
-            })
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
         }
     }
 
@@ -37,10 +34,8 @@ class CommentRouter {
             const result = await this._commentService.getCommentsByPostId(postId);
            
             res.status(200).send({ comments: result.comments });
-        } catch(err) {
-            res.status(400).send({
-                message: err.message
-            })
+        } catch(error) {
+            next(error);
         }
     }
 }

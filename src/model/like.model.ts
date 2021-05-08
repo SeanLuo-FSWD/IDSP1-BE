@@ -1,6 +1,0 @@
-
-class LikeModel {
-    constructor() {
-        
-    }
-}

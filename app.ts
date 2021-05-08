@@ -6,6 +6,8 @@ import { connectDB } from "./src/util/database.util";
 
 import APIRouter from './src/router/api.router';
 
+import errorHandlingMiddleware from "./src/middleware/errorHandling.middleware";
+
 class App {
     private _app: express.Application;
     private readonly _port;
@@ -18,6 +20,7 @@ class App {
         this.initAPIRouter();
         console.log(process.env.PORT);
         this._port = process.env.PORT || 8000;
+        this.initErrorHandling();
     }
 
     public async startServer() {
@@ -32,7 +35,11 @@ class App {
     }
 
     public initAPIRouter() {
-        this._app.use("/", this.apiRouter.router);
+        this._app.use(`${this.apiRouter.path}`, this.apiRouter.router);
+    }
+
+    public initErrorHandling() {
+        this._app.use(errorHandlingMiddleware);
     }
 
     public initHostingReactUI() {

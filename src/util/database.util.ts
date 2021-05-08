@@ -18,9 +18,5 @@ function getDB () {
     return _database; 
 }
 
-function _attr() {
-    return 123;
-}
 
-
-export { connectDB, getDB, _attr};
+export { connectDB, getDB, client };

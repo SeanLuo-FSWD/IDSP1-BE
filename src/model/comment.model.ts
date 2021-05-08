@@ -1,4 +1,5 @@
-import { getDB } from "../util/database.util";
+import { getDB, client } from "../util/database.util";
+import { ObjectId } from "mongodb";
 
 class CommentModel {
     private _db = getDB();
@@ -17,48 +18,36 @@ class CommentModel {
     }
 
     async create() {
-        try {
-            const newComment = {
-                text: this._text,
-                userId: this._userId,
-                postId: this._postId,
-                createdAt: this._createdAt
-            }
-            const result = await this._db.collection("comment").insertOne(newComment);
-            console.log(result);
-            return {
-                status: 200,
-                comment: {
-                    commentId: result.insertedId,
-                    ...newComment
-                }
-            }
-
-        } catch(err) {
-            throw {
-                status: 500,
-                message: "Error when inserting comment into database."
-            }
+        const session = client.startSession();
+        
+        session.startTransaction();
+        const newComment = {
+            text: this._text,
+            userId: this._userId,
+            postId: this._postId,
+            createdAt: this._createdAt
+        }
+        console.log("creating new comment");
+        await this._db.collection("post").updateOne(
+            { id: new ObjectId(this._postId) },
+            { $inc: { commentsCount: 1 } }
+        );
+        const result = await this._db.collection("comment").insertOne(newComment);
+        session.commitTransaction();
+        
+        return {
+            commentId: result.insertedId,
+            ...newComment
         }
     }
 
     static async getAllCommentsByPostId(postId) {
-        try {
-            const database = getDB();
-            const comments = await database.collection("comment").find({ postId }).toArray();
+        const database = getDB();
+        const comments = await database.collection("comment").find({ postId }).toArray();
 
-            console.log(comments);
-            return {
-                status: 200,
-                comments
-            }
-        } catch(err) {
-            console.log("--- Error: getAllCommentsByPostId ---", err);
-            throw {
-                status: 500,
-                message: "MODEL: Failed to query the comments by post id."
-            }
-        }
+        console.log(comments);
+        return comments;
+ 
     }
 }
 

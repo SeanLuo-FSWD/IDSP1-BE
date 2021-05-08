@@ -9,10 +9,12 @@ declare global {
 }
 
 function checkAuth(req: Request, res: Response, next: NextFunction) {
-    console.log(req.isAuthenticated());
+    console.log("is Authed", req.isAuthenticated());
     if (req.isAuthenticated()) {
         return next();
     }
+    console.log("unauthed");
+
     return res.status(401).send({
         status: "error",
         message: "Unauthorized."

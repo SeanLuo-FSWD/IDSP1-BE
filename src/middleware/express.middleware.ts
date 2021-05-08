@@ -3,6 +3,7 @@ import morgan from "morgan";
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
+import errorHandlingMiddleware from "./errorHandling.middleware";
 
 module.exports = (app) => {
     console.log("init middlewares");

@@ -6,14 +6,7 @@ class CommentService {
             const newComment = new CommentModel(userId, comment);
 
             const result = await newComment.create();
-            if (result.status === 200) {
-                return result;
-            } else {
-                throw {
-                    status: 500,
-                    message: "Failed to insert comment into database."
-                }
-            }
+            console.log(result);
         } catch(err) {
             return err
         }

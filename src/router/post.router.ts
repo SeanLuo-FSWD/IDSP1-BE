@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import PostService from "../service/post.service";
 import multerUpload from "../middleware/multerUpload.middleware";
+import PostModel from '../model/post.model';
 
 declare global {
     namespace Express {
@@ -26,22 +27,22 @@ class PostRouter {
     }
 
     private initializeRoutes() {
-        this.router.post(`${this.path}`, multerUpload.array("filesToUpload[]"), this.createPost);
-        this.router.post(`${this.path}/delete`, this.deletePost);
-        this.router.post(`${this.path}/like`, this.toggleLikePost)
+        this.router.post(`/`, multerUpload.array("filesToUpload[]"), this.createPost);
+        this.router.post(`/delete`, this.deletePost);
+        this.router.post(`/like`, this.toggleLikePost)
+        this.router.get("/:postId", this.getFullPostByPostId);
     }
 
-    private createPost = async (req: Request, res: Response) => {
-        console.log("-- create post -- ");
+    private createPost = async (req: Request, res: Response, next: NextFunction) => {
+        console.log(`--- ${req.user.userId} creating post ---`);
         
-        console.log(req.user);  
         const userId = req.user.userId;
         try {
             const result = await this._postService.createPost(userId, req);
             console.log(result);
             res.status(200).send({ message: "success" });
         } catch(error) {
-            res.status(400).send({ message: error });
+            next(error);
         }
     }
 
@@ -54,20 +55,30 @@ class PostRouter {
             await this._postService.deletePost(userId, postId);
             res.status(200).send({ message: "success" })
         } catch(error) {
-            console.log("error", error)
-            res.status(error.status).send({ message: error.message });
+            console.log("delete post router", error);
+            next(error);
         }
     }
 
     private toggleLikePost = async (req: Request, res: Response, next: NextFunction) => {
+        console.log("toggle like post router");
         try {
             const userId = req.user.userId;
             const postId = req.body.postId;
             const result = await PostService.toggleLikePost(userId, postId);
-            res.status(result.status).send({ message: result.message });
+            res.status(200).send({ message: result });
         } catch(error) {
-            console.log("router: ", error);
-            res.status(error.status).send({ message: error.message });
+            next(error);
+        }
+    }
+
+    private getFullPostByPostId = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const postId = req.params.postId;
+            const result = await PostModel.getFullPostByPostId(postId);
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
         }
     }
 }
