@@ -75,14 +75,37 @@ class PostModel {
     static getFullPostByPostId = async (postId: string) => {
         console.log("get full post model", postId);
         const database = getDB();
-        const post = await database.collection("post").findOne({ _id: new ObjectId(postId) });
-        const comments = await CommentModel.getAllCommentsByPostId(postId);
-        const likes = await database.collection("like").find({ postId: postId }).toArray();
-        console.log(post);
-        if (post) {
-            post.comments = comments? comments : [];
-            post.likes = likes? likes : [];
-        }
+        const post = await database.collection("post").aggregate([
+            { 
+                $addFields: { "postId": { "$toString": "$_id" } }
+            },
+            {
+                $lookup: {
+                    from: "comment",
+                    localField: "postId",
+                    foreignField: "postId",
+                    as: "comments"
+                }
+            },
+            {
+                $lookup: {
+                    from: "like",
+                    localField: "postId",
+                    foreignField: "postId",
+                    as: "likes"
+                }
+            },
+        ]).toArray();
+
+        console.log("aggregate", post);
+        // const post = await database.collection("post").findOne({ _id: new ObjectId(postId) });
+        // const comments = await CommentModel.getAllCommentsByPostId(postId);
+        // const likes = await database.collection("like").find({ postId: postId }).toArray();
+        // console.log(post);
+        // if (post) {
+        //     post.comments = comments? comments : [];
+        //     post.likes = likes? likes : [];
+        // }
         return post;
     }
 }
