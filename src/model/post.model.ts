@@ -5,6 +5,8 @@ import CommentModel from "./comment.model";
 
 class PostModel {
     private _userId: string;
+    private _username: string;
+    private _avatar: string;
     private _createdAt: string;
     private _text: string;
     private _images: string[];
@@ -12,8 +14,10 @@ class PostModel {
     private _commentsCount: number;
     private _db = getDB();
     
-    constructor(userId: string, input) {
-        this._userId = userId;
+    constructor(user, input) {
+        this._userId = user.userId;
+        this._username = user.username;
+        this._avatar = user.avatar;
         this._createdAt = new Date().toString();
         this._text = input.text;
         this._images = input.images;//[] for no images,  
@@ -24,6 +28,8 @@ class PostModel {
     public async create() {
         const newPost = {
             userId: this._userId,
+            username: this._username,
+            avatar: this._avatar,
             createdAt: this._createdAt,
             text: this._text,
             images: this._images,
@@ -50,16 +56,22 @@ class PostModel {
         return Boolean(deleteResult.deletedCount);
     }
 
-    static async togglePostLike(userId: string, postId: string) {
+    static async togglePostLike(user, postId: string) {
         const database = getDB();
         const session = client.startSession();
+        const userId = user.userId;
+        const like = {
+            userId,
+            username: user.username,
+            avatar: user.avatar
+        }
         session.startTransaction();
         const isLiked = await database.collection("like").findOne({ postId, userId });
         if (isLiked) {
             await database.collection("like").deleteOne({ postId, userId });
             await database.collection("post").updateOne({ _id: new ObjectId(postId) }, { $inc: { likesCount: -1 } });
         } else {
-            await database.collection("like").insertOne({ postId, userId });
+            await database.collection("like").insertOne(like);
             await database.collection("post").updateOne({ _id: new ObjectId(postId) }, { $inc: { likesCount: 1 } });
         }
         await session.commitTransaction();
@@ -98,15 +110,20 @@ class PostModel {
         ]).toArray();
 
         console.log("aggregate", post);
-        // const post = await database.collection("post").findOne({ _id: new ObjectId(postId) });
-        // const comments = await CommentModel.getAllCommentsByPostId(postId);
-        // const likes = await database.collection("like").find({ postId: postId }).toArray();
-        // console.log(post);
-        // if (post) {
-        //     post.comments = comments? comments : [];
-        //     post.likes = likes? likes : [];
-        // }
-        return post;
+        return post[0];
+    }
+
+    static updateUserPostsAvatar = async (postId: string, newAvatarLink: string) => {
+        const database = getDB();
+        await database.collection("post").update({
+            _id: new ObjectId(postId)
+        }, 
+        {
+            $set: {
+                avatar: newAvatarLink
+            }
+        })
+        return "success";
     }
 }
 

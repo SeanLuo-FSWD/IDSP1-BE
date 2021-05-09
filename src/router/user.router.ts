@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction, Router } from "express";
 import AuthService from "../service/authentication.service";
 import { checkAuth } from "../middleware/authentication.middleware";
+import UserService from "../service/user.service";
+import multerUpload from "../middleware/multerUpload.middleware";
 
 declare global {
     namespace Express {
         interface Request {
-            logout: any
+            logout: any,
+            files: File[]
         }
     }
 }
@@ -25,6 +28,7 @@ class UserRouter {
         this.router.get('/logout', this.logout);
         this.router.get('/verify', this.verifyEmail);
         this.router.get('/authenticate', checkAuth, this.authenticate);
+        this.router.post('/avatar/:userId', multerUpload.array("filesToUpload[]"), this.updateProfilePhoto);
     }
 
     private signUp = async (req: Request, res: Response, next: NextFunction) => {
@@ -65,6 +69,22 @@ class UserRouter {
             console.log(userId);
             await this._authService.verifyEmail(userId);
             res.status(200).send({ message: "verified" });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private updateProfilePhoto = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const image = req.files;
+            const newAvatarLink = await UserService.updateUserAvatar(userId, image);
+            res.status(200).send({
+                userId: req.user.userId,
+                email: req.user.email,
+                username: req.user.username,
+                avatar: newAvatarLink
+            });
         } catch(error) {
             next(error);
         }

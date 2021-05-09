@@ -1,15 +1,17 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import UserModel from "../model/user.model";
 import passport from "../util/passport.util";
 import sendEmail from "../util/nodemailer.util";
+
 
 declare global {
     namespace Express {
         interface Request {
             user: {
                 userId: string,
-                email: string
+                email: string,
+                avatar: string,
+                username: string,
+                emailVerified: boolean
             } //or other type you would like to use,
             sessionID: string,
             login: any
@@ -34,14 +36,12 @@ class AuthenticationService {
                 });
                 //login is coded by passport, it writes the user information into session
                 req.login(user, loginError => {
+                    console.log("req login user", user);
                     if (loginError) reject({ 
                         status: 500, 
                         message: "Login error." 
                     });
-                    resolve({ 
-                        userId: user.userId, 
-                        username: user.username 
-                    });
+                    resolve(user);
                 })
             })(req, res, next);
         })

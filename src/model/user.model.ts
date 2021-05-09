@@ -6,7 +6,7 @@ class UserModel {
     private _db = getDB();
     private _email: string;
     private _password: string;
-    private _profilePhoto: string;
+    private _avatar: string;
     private _username: string;
     private _emailVerified: boolean;
     private _createdAt: string;
@@ -17,7 +17,7 @@ class UserModel {
         this._password = input.password;
         this._username = input.username;
         this._emailVerified = false;
-        this._profilePhoto = "https://res.cloudinary.com/depk87ok3/image/upload/v1619723749/defaultProfilePhoto-min_zdwber.png";
+        this._avatar = "https://res.cloudinary.com/depk87ok3/image/upload/v1619723749/defaultProfilePhoto-min_zdwber.png";
         this._createdAt = new Date().toString();
     }
 
@@ -33,7 +33,7 @@ class UserModel {
             email: this._email,
             password: passwordHash,
             username: this._username,
-            profilePhoto: this._profilePhoto,
+            avatar: this._avatar,
             emailVerified: this._emailVerified,
             createdAt: this._createdAt
         })
@@ -53,7 +53,8 @@ class UserModel {
             return {
                 userId,
                 email: user.email,
-                username: user.username
+                username: user.username,
+                avatar: user.avatar
             }
         }
         return null;
@@ -74,6 +75,7 @@ class UserModel {
                 email: user.email,
                 userId: user._id.toString(),
                 username: user.username,
+                avatar: user.avatar,
                 emailVerified: user.emailVerified
             }
         }
@@ -88,6 +90,19 @@ class UserModel {
         }});
 
         return true;
+    }
+
+    static updateUserAvatar = async (userId, newAvatarLink) => {
+        const database = getDB();
+        await database.collection("user").updateOne({
+            _id: new ObjectId(userId)
+        }, 
+        {
+            $set: {
+                avatar: newAvatarLink
+            }
+        })
+        return "success";
     }
 }
 

@@ -6,10 +6,6 @@ import PostModel from '../model/post.model';
 declare global {
     namespace Express {
         interface Request {
-            user: {
-                userId: string,
-                email: string
-            } //or other type you would like to use,
             sessionID: string,
             login: any
         }
@@ -35,10 +31,8 @@ class PostRouter {
 
     private createPost = async (req: Request, res: Response, next: NextFunction) => {
         console.log(`--- ${req.user.userId} creating post ---`);
-        
-        const userId = req.user.userId;
         try {
-            const result = await this._postService.createPost(userId, req);
+            const result = await this._postService.createPost(req);
             console.log(result);
             res.status(200).send({ message: "success" });
         } catch(error) {
@@ -63,9 +57,9 @@ class PostRouter {
     private toggleLikePost = async (req: Request, res: Response, next: NextFunction) => {
         console.log("toggle like post router");
         try {
-            const userId = req.user.userId;
+            const user = req.user;
             const postId = req.body.postId;
-            const result = await PostService.toggleLikePost(userId, postId);
+            const result = await PostService.toggleLikePost(user, postId);
             res.status(200).send({ message: result });
         } catch(error) {
             next(error);

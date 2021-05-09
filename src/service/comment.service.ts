@@ -1,31 +1,24 @@
 import CommentModel from "../model/comment.model";
+import PostModel from "../model/post.model";
 
 class CommentService {
-    public async createComment(userId: string, comment) {
-        try {
-            const newComment = new CommentModel(userId, comment);
-
-            const result = await newComment.create();
-            console.log(result);
-        } catch(err) {
-            return err
+    public async createComment(user, comment) {
+        const newComment = new CommentModel(user, comment);
+        const post = await PostModel.getPostByPostId(comment.postId);
+        if (!post) throw {
+            status: 404,
+            message: "Post not found."
         }
+
+        const result = await newComment.create();
+        console.log(result);
+        return result;
     }
 
     public async getCommentsByPostId(postId) {
-        try {
-            const result = await CommentModel.getAllCommentsByPostId(postId);
+        const result = await CommentModel.getAllCommentsByPostId(postId);
 
-            return {
-                status: result.status,
-                comments: result.comments
-            }
-        } catch(err) {
-            throw {
-                status: 500,
-                message: "SERVICE: Failed to get all comments by post id."
-            }
-        }
+        return result;
     }
 }
 

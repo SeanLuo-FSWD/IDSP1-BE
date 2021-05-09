@@ -2,7 +2,8 @@ import PostModel from "../model/post.model";
 import ImageModel from "../model/image.model";
 
 class PostService {
-    public async createPost(userId, req) {
+    public async createPost(req) {
+        const user = req.user;
         const postData = req.body;
         
         let imagesUploadResult = [];
@@ -12,10 +13,10 @@ class PostService {
         }
 
         postData.images = imagesUploadResult.length?
-            imagesUploadResult.map((imageInfo: { status: string, imageUrl: string }) => imageInfo.imageUrl) :
+            imagesUploadResult.map((imageUrl: string) => imageUrl) :
             [];
 
-        const post = new PostModel(userId, postData);
+        const post = new PostModel(user, postData);
         console.log(post);
         await post.create();
         
@@ -38,8 +39,13 @@ class PostService {
         }
     }
 
-    static async toggleLikePost(userId, postId) {
-        const result = await PostModel.togglePostLike(userId, postId);
+    static async toggleLikePost(user, postId) {
+        const post = await PostModel.getPostByPostId(postId);
+        if (!post) throw {
+            status: 404,
+            message: "Post not found."
+        }
+        const result = await PostModel.togglePostLike(user, postId);
         console.log("---POST SERVICE: toggleLikePost result", result);
         return result;
     }

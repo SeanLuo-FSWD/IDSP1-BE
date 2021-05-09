@@ -3,17 +3,19 @@ import { ObjectId } from "mongodb";
 
 class CommentModel {
     private _db = getDB();
-    private static _db = getDB();
     private _createdAt: string;
     private _text: string;
-    private _commentId: string;
     private _userId: string;
+    private _username: string;  
+    private _avatar: string;
     private _postId: string;
 
-    constructor(userId, input) {
+    constructor(user, input) {
+        this._userId = user.userId;
+        this._username = user.username;
+        this._avatar = user.avatar;
         this._createdAt = new Date().toString();
         this._text = input.text;
-        this._userId = userId;
         this._postId = input.postId;
     }
 
@@ -22,8 +24,10 @@ class CommentModel {
         
         session.startTransaction();
         const newComment = {
-            text: this._text,
             userId: this._userId,
+            username: this._username,
+            avatar: this._avatar,
+            text: this._text,
             postId: this._postId,
             createdAt: this._createdAt
         }
@@ -47,7 +51,19 @@ class CommentModel {
 
         console.log(comments);
         return comments;
- 
+    }
+
+    static updateUserCommentsAvatar = async (userId: string, newAvatarLink: string) => {
+        const database = getDB();
+        await database.collection("comment").update({
+            userId: userId
+        }, 
+        {
+            $set: {
+                avatar: newAvatarLink
+            }
+        })
+        return "success";
     }
 }
 
