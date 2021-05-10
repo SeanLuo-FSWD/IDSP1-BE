@@ -25,6 +25,7 @@ class PostRouter {
     private initializeRoutes() {
         this.router.post(`/`, multerUpload.array("filesToUpload[]"), this.createPost);
         this.router.post(`/delete`, this.deletePost);
+        this.router.get('/like/:postId', this.getLikesByPostId);
         this.router.post(`/like`, this.toggleLikePost)
         this.router.get("/:postId", this.getFullPostByPostId);
     }
@@ -34,7 +35,7 @@ class PostRouter {
         try {
             const result = await this._postService.createPost(req);
             console.log(result);
-            res.status(200).send({ message: "success" });
+            res.status(200).send(result);
         } catch(error) {
             next(error);
         }
@@ -69,7 +70,17 @@ class PostRouter {
     private getFullPostByPostId = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const postId = req.params.postId;
-            const result = await PostModel.getFullPostByPostId(postId);
+            const result = await PostService.getFullPostByPostId(postId);
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private getLikesByPostId = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const postId = req.params.postId;
+            const result = await PostService.getLikesByPostId(postId);
             res.status(200).send(result);
         } catch(error) {
             next(error);

@@ -8,7 +8,8 @@ declare global {
     namespace Express {
         interface Request {
             logout: any,
-            files: File[]
+            files: File[],
+            file: File
         }
     }
 }
@@ -31,6 +32,7 @@ class UserRouter {
         this.router.post('/followUser', this.followUser);
         this.router.get('/followingUsers', this.getFollowingUsers);
         this.router.post('/avatar/:userId', multerUpload.array("filesToUpload[]"), this.updateProfilePhoto);
+        this.router.post('/profile', [ checkAuth, multerUpload.single("avatar") ], this.updateProfile);
     }
 
     private signUp = async (req: Request, res: Response, next: NextFunction) => {
@@ -59,7 +61,7 @@ class UserRouter {
         res.status(200).send({ message: "logout" })
     }
 
-    public authenticate = (req: Request, res: Response) => {
+    private authenticate = (req: Request, res: Response) => {
         console.log("--- authenticated user ---");
         res.status(200).send(req.user);
     }
@@ -87,6 +89,21 @@ class UserRouter {
                 username: req.user.username,
                 avatar: newAvatarLink
             });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const updates = req.body;
+            console.log(req);
+            if (req.file) {
+                updates.avatar = req.file;
+            }
+            const result = await UserService.updateUserProfile(userId, updates);
+            res.status(200).send(result);
         } catch(error) {
             next(error);
         }

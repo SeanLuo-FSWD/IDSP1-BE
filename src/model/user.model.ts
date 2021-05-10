@@ -10,6 +10,8 @@ class UserModel {
     private _username: string;
     private _emailVerified: boolean;
     private _createdAt: string;
+    private _age: number | undefined;
+    private _gender: string | undefined;
     private saltRounds: number = 10;
     
     constructor(input) {
@@ -35,6 +37,8 @@ class UserModel {
             username: this._username,
             avatar: this._avatar,
             emailVerified: this._emailVerified,
+            age: this._age,
+            gender: this._gender,
             createdAt: this._createdAt
         })
 
@@ -54,7 +58,9 @@ class UserModel {
                 userId,
                 email: user.email,
                 username: user.username,
-                avatar: user.avatar
+                avatar: user.avatar,
+                gender: user.gender,
+                age: user.age
             }
         }
         return null;
@@ -76,6 +82,8 @@ class UserModel {
                 userId: user._id.toString(),
                 username: user.username,
                 avatar: user.avatar,
+                age: user.age,
+                gender: user.gender,
                 emailVerified: user.emailVerified
             }
         }
@@ -90,6 +98,16 @@ class UserModel {
         }});
 
         return true;
+    }
+
+    static updateProfile = async (userId, updates) => {
+        const database = getDB();
+        await database.collection("user").updateOne({
+            _id: new ObjectId(userId)
+        }, {
+            $set: updates
+        })
+        return "success";
     }
 
     static updateUserAvatar = async (userId, newAvatarLink) => {
