@@ -38,12 +38,9 @@ class PostModel {
         }
 
         const result = await this._db.collection("post").insertOne(newPost);
-
+        console.log("newPost", newPost);
         //Figure out what to return here
-        return {
-            postId: result.insertedId,
-            ...newPost
-        };
+        return newPost;
     }
 
     static async delete(userId, postId) {
@@ -61,6 +58,7 @@ class PostModel {
         const session = client.startSession();
         const userId = user.userId;
         const like = {
+            postId,
             userId,
             username: user.username,
             avatar: user.avatar

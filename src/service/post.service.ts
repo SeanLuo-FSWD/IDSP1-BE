@@ -1,5 +1,6 @@
 import PostModel from "../model/post.model";
 import ImageModel from "../model/image.model";
+import LikeModel from "../model/like.model";
 
 class PostService {
     public async createPost(req) {
@@ -18,9 +19,9 @@ class PostService {
 
         const post = new PostModel(user, postData);
         console.log(post);
-        await post.create();
+        const result = await post.create();
         
-        return post;
+        return result;
     }
 
     public async deletePost(userId, postId) {
@@ -52,6 +53,11 @@ class PostService {
 
     static async getFullPostByPostId(postId: string) {
         const result = PostModel.getFullPostByPostId(postId);
+        return result;
+    }
+
+    static async getLikesByPostId(postId: string) {
+        const result = LikeModel.getLikesByPostId(postId);
         return result;
     }
 }
