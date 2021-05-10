@@ -35,12 +35,13 @@ class AuthenticationService {
                     message: "Email not verified." 
                 });
                 //login is coded by passport, it writes the user information into session
-                req.login(user, loginError => {
+                req.login(user, async loginError => {
                     console.log("req login user", user);
                     if (loginError) reject({ 
                         status: 500, 
                         message: "Login error." 
                     });
+
                     resolve(user);
                 })
             })(req, res, next);

@@ -28,6 +28,8 @@ class UserRouter {
         this.router.get('/logout', this.logout);
         this.router.get('/verify', this.verifyEmail);
         this.router.get('/authenticate', checkAuth, this.authenticate);
+        this.router.post('/followUser', this.followUser);
+        this.router.get('/followingUsers', this.getFollowingUsers);
         this.router.post('/avatar/:userId', multerUpload.array("filesToUpload[]"), this.updateProfilePhoto);
     }
 
@@ -85,6 +87,26 @@ class UserRouter {
                 username: req.user.username,
                 avatar: newAvatarLink
             });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private followUser = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const followingUserId = req.body.followingUserId;
+            const result = await UserService.followUser(userId, followingUserId);
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private getFollowingUsers = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await UserService.getFollowingUsers(req.user.userId);
+            res.status(200).send(result);
         } catch(error) {
             next(error);
         }
