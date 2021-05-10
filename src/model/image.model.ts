@@ -13,22 +13,16 @@ class ImageModel {
     }
 
     public async upload() {
-        try {
-            const uploadParams = {
-                Bucket: this._bucket,
-                Key: this._key,
-                Body: this._body,
-            }
-            const data = await s3.send(new PutObjectCommand(uploadParams));
-            const s3domain = "https://idsp2.s3-us-west-1.amazonaws.com";
-            console.log("Success url", `${s3domain}/${encodeURIComponent(this._key)}`);
-            return {
-                status: "success",
-                imageUrl: `${s3domain}/${encodeURIComponent(this._key)}`
-            }
-        } catch(err) {
-            console.log("error", err);
+        const uploadParams = {
+            Bucket: this._bucket,
+            Key: this._key,
+            Body: this._body,
         }
+        await s3.send(new PutObjectCommand(uploadParams));
+        const s3domain = "https://idsp2.s3-us-west-1.amazonaws.com";
+        console.log("image uploaded successfully on : ", `${s3domain}/${encodeURIComponent(this._key)}`);
+        const imageUrl = `${s3domain}/${encodeURIComponent(this._key)}`;
+        return imageUrl;
     }
 }
 

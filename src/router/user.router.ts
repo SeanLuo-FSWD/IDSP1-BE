@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction, Router } from "express";
 import AuthService from "../service/authentication.service";
+import { checkAuth } from "../middleware/authentication.middleware";
+import UserService from "../service/user.service";
+import multerUpload from "../middleware/multerUpload.middleware";
 
 declare global {
     namespace Express {
         interface Request {
-            logout: any
+            logout: any,
+            files: File[]
         }
     }
 }
-
 
 class UserRouter {
     public path = "/user";
@@ -20,26 +23,22 @@ class UserRouter {
     }
 
     private initializeRoutes() {
-        this.router.post(`${this.path}/signUp`, this.signUp);
-        this.router.post(`${this.path}/login`, this.login);
-        this.router.get(`${this.path}/logout`, this.logout);
-        this.router.get(`${this.path}/verify`, this.verifyEmail)
+        this.router.post('/signUp', this.signUp);
+        this.router.post('/login', this.login);
+        this.router.get('/logout', this.logout);
+        this.router.get('/verify', this.verifyEmail);
+        this.router.get('/authenticate', checkAuth, this.authenticate);
+        this.router.post('/followUser', this.followUser);
+        this.router.get('/followingUsers', this.getFollowingUsers);
+        this.router.post('/avatar/:userId', multerUpload.array("filesToUpload[]"), this.updateProfilePhoto);
     }
 
-    private signUp = async (req: Request, res: Response) => {
+    private signUp = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const result = await this._authService.signUp(req.body);
-            if (result.status === 200) {
-                res.status(200).send({ message: "success" })
-            } else {
-                throw {
-                    status: result.status,
-                    message: result.message
-                }
-            }
+            res.status(200).send({ message: "success" })
         } catch(error) {
-            console.log(error);
-            res.status(error.status).send({ message: error.message })
+            next(error);
         }
     }
 
@@ -47,27 +46,69 @@ class UserRouter {
         try {
             const result = await this._authService.login(req, res, next);
             console.log(result);
-            res.status(result.statusCode).send({ message: result.message, userId: result.userId, username: result.username});
-        } catch(err) {
-            res.status(err.statusCode).send({ message: err.message });
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
         }
     }
 
     private logout = (req: Request, res: Response) => {
+        console.log(`--- ${req.user.userId} logout ---`)
         req.logout();
-        console.log("user logout");
+
         res.status(200).send({ message: "logout" })
     }
 
-    private verifyEmail = async (req: Request, res: Response) => {
+    public authenticate = (req: Request, res: Response) => {
+        console.log("--- authenticated user ---");
+        res.status(200).send(req.user);
+    }
+
+    private verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
         try {
             console.log("--- email verification ---");
             const userId = req.query.id;
             console.log(userId);
-            const result = await this._authService.verifyEmail(userId);
-            res.status(result.status).send({ message: result.message });
-        } catch(err) {
-            res.status(400).send({ message: "Bad Request." })
+            await this._authService.verifyEmail(userId);
+            res.status(200).send({ message: "verified" });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private updateProfilePhoto = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const image = req.files;
+            const newAvatarLink = await UserService.updateUserAvatar(userId, image);
+            res.status(200).send({
+                userId: req.user.userId,
+                email: req.user.email,
+                username: req.user.username,
+                avatar: newAvatarLink
+            });
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private followUser = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user.userId;
+            const followingUserId = req.body.followingUserId;
+            const result = await UserService.followUser(userId, followingUserId);
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    private getFollowingUsers = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const result = await UserService.getFollowingUsers(req.user.userId);
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
         }
     }
 }

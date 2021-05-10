@@ -1,15 +1,17 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import UserModel from "../model/user.model";
 import passport from "../util/passport.util";
 import sendEmail from "../util/nodemailer.util";
+
 
 declare global {
     namespace Express {
         interface Request {
             user: {
                 userId: string,
-                email: string
+                email: string,
+                avatar: string,
+                username: string,
+                emailVerified: boolean
             } //or other type you would like to use,
             sessionID: string,
             login: any
@@ -18,19 +20,29 @@ declare global {
 }
 
 class AuthenticationService {
-    public login(req, res, next): Promise<{ statusCode: number, message: string, userId: string, username: string}> {
+    public login(req, res, next): Promise<{ userId: string, username: string }> {
         return new Promise((resolve, reject) => {
-            console.log("auth promise");
-            console.log(passport.Strategy);
             passport.authenticate('local', function (err, user) {
-                if (err) reject({ statusCode: 400, message: err.message });
-                if (!user) reject({ statusCode: 404, message: "User not found" });
+                if (err) reject({ 
+                    status: 400, message: err.message 
+                });
+                if (!user) reject({ 
+                    status: 404, message: "Invalid Email or Password." 
+                });
                 console.log(user);
-                if (!user.emailVerified) reject({ statusCode: 400, message: "Email not verified." });
+                if (!user.emailVerified) reject({ 
+                    status: 400, 
+                    message: "Email not verified." 
+                });
                 //login is coded by passport, it writes the user information into session
-                req.login(user, loginError => {
-                    if (loginError) reject({ statusCode: 500, message: "Login error."});
-                    resolve({ statusCode: 200, message: "success", userId: user.userId, username: user.username });
+                req.login(user, async loginError => {
+                    console.log("req login user", user);
+                    if (loginError) reject({ 
+                        status: 500, 
+                        message: "Login error." 
+                    });
+
+                    resolve(user);
                 })
             })(req, res, next);
         })
@@ -38,52 +50,33 @@ class AuthenticationService {
 
     public async signUp(signUpInfo) {
         //signUpInfo: { email: .., password: .. }
-        try {
-            const user = new UserModel(signUpInfo);
-            const isExisted = await user.isExisted();
-            console.log("isExisted", isExisted);
-            if (isExisted) {
-                return {
-                    status: 400,
-                    message: "User already exists."
-                }
-            } else {
-                const result = await user.create();
-                console.log(result);
-                await sendEmail(result.email, result.userId);
-                return {
-                    status: result.status,
-                    message: "success"
-                }
+        const user = new UserModel(signUpInfo);
+        const isExisted = await user.isExisted();
+        console.log("isExisted", isExisted);
+        if (isExisted) {
+            throw {
+                status: 400,
+                message: "User already exists."
             }
-        } catch(error) {
-            return {
-                status: 500,
-                message: `${error}`
-            }
+        } else {
+            const result = await user.create();
+            await sendEmail(result.email, result.userId);
+            return "success";
         }
     };
 
     public async verifyEmail(userId) {
-        try {
-            const user = await UserModel.getUserById(userId);
-            console.log(user);
-            if (user) {
-                const result = await UserModel.verifyUserByEmail(userId);
-                return result;
-            } else {
-                return {
-                    status: 404,
-                    message: "User not found."
-                }
-            }
-        } catch(err) {
-            return {
-                status: 500,
-                message: "Failed connecting to database."
+        const user = await UserModel.getUserById(userId);
+
+        if (user) {
+            await UserModel.verifyUserByEmail(userId);
+            return "success";
+        } else {
+            throw {
+                status: 404,
+                message: "Invalid Email verification link"
             }
         }
-
     }
 }
 

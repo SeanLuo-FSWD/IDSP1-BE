@@ -11,36 +11,32 @@ class CommentRouter {
     }
 
     private initializeRoutes() {
-        this.router.post(`${this.path}`, this.createComment);
-        this.router.get(`${this.path}`, this.getCommentByPostId);
+        this.router.post(`/`, this.createComment);
+        this.router.get(`/:postId`, this.getCommentByPostId);
     }
 
     private createComment = async (req: Request, res: Response, next: NextFunction) => {
+        console.log(req.user);
         try {
-            const userId = req.user.userId;
+            const user = req.user;
             const commentBody = req.body;
             console.log("--- create comment ---");
-            const result = await this._commentService.createComment(userId, commentBody);
+            const result = await this._commentService.createComment(user, commentBody);
             console.log("result", result);
-            res.status(result.status).send({...result.comment});
-        } catch(err) {
-            console.log(err);
-            res.status(400).send({
-                message: err
-            })
+            res.status(200).send(result);
+        } catch(error) {
+            next(error);
         }
     }
 
     private getCommentByPostId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const postId = req.query.postId;
+            const postId = req.params.postId;
             const result = await this._commentService.getCommentsByPostId(postId);
            
-            res.status(200).send({ comments: result.comments });
-        } catch(err) {
-            res.status(400).send({
-                message: err.message
-            })
+            res.status(200).send({ comments: result });
+        } catch(error) {
+            next(error);
         }
     }
 }
