@@ -13,10 +13,6 @@ class PostService {
     const postData = req.body;
 
     let imagesUploadResult = [];
-    console.log("777777777777777777777");
-    console.log(req.files);
-    console.log("88888888888888888888");
-    console.log(req.body);
 
     if (req.files.length) {
       const imagesUploadArr = req.files.map(
@@ -55,11 +51,17 @@ class PostService {
 
   static async toggleLikePost(user, postId) {
     const post = await PostModel.getPostByPostId(postId);
-    if (!post)
+    console.log("eeeeeeeeeeeeeeeeeeeeee");
+    console.log(postId);
+    if (!post) {
+      console.log("fffffffffffffffffffffff");
+
       throw {
         status: 404,
         message: "Post not found.",
       };
+    }
+
     const result = await PostModel.togglePostLike(user, postId);
     console.log("---POST SERVICE: toggleLikePost result", result);
     return result;

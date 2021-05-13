@@ -26,16 +26,14 @@ class PostModel {
 
   static async getFeed(filter: any) {
     const database = getDB();
-    const cursor = await database.collection("post").find();
-    let feedArr = [];
-    await cursor.forEach((element) => {
-      feedArr.push(element);
-      console.log("2222222222222222");
-      console.log(element);
-    });
-    console.log("000000000000000000000");
-    console.log(feedArr);
-    return feedArr;
+    const post = await database
+      .collection("post")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    console.log("getFeed: all posts", post);
+    return post;
   }
 
   public async create() {
@@ -94,6 +92,23 @@ class PostModel {
     await session.commitTransaction();
     return isLiked ? "unliked" : "liked";
   }
+
+  static getPostsByUserId = async (userId: string) => {
+    const database = getDB();
+    const posts = await database
+      .collection("post")
+      .find({ userId: userId })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    console.log(
+      "getPostsByUserId getPostsByUserId getPostsByUserId getPostsByUserId"
+    );
+
+    console.log(posts);
+
+    return posts;
+  };
 
   static getPostByPostId = async (postId: string) => {
     const database = getDB();

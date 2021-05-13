@@ -12,6 +12,7 @@ class UserModel {
   private _createdAt: string;
   private _age: number | undefined;
   private _gender: string | undefined;
+  private _location: string | undefined;
   private saltRounds: number = 10;
 
   constructor(input) {
@@ -24,6 +25,21 @@ class UserModel {
     this._createdAt = new Date().toString();
   }
 
+  static async getPeople(filter) {
+    const database = getDB();
+    const people = await database
+      .collection("user")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    console.log("2222222222222222");
+    console.log("getPeople user.model");
+    console.log(people);
+
+    console.log("getPeople: all people", people);
+    return people;
+  }
   static async removeFirstTime(userId) {
     const query = { _id: new ObjectId(userId) };
     const database = getDB();
@@ -52,6 +68,7 @@ class UserModel {
       emailVerified: this._emailVerified,
       age: this._age,
       gender: this._gender,
+      location: this._location,
       createdAt: this._createdAt,
     });
 
@@ -75,6 +92,7 @@ class UserModel {
         username: user.username,
         avatar: user.avatar,
         gender: user.gender,
+        location: user.location,
         age: user.age,
       };
     }
@@ -99,6 +117,7 @@ class UserModel {
         avatar: user.avatar,
         age: user.age,
         gender: user.gender,
+        location: user.location,
         emailVerified: user.emailVerified,
         firstTime: user.firstTime,
       };

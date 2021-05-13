@@ -71,6 +71,9 @@ class PostRouter {
   ) => {
     console.log("--- Delete Post ---");
     try {
+      console.log("req.body");
+      console.log(req.body);
+
       const userId = req.user.userId;
       const postId = req.body.postId;
       console.log("delete post router: postId ", postId);

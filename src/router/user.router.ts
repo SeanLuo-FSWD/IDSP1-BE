@@ -133,6 +133,9 @@ class UserRouter {
     res: Response,
     next: NextFunction
   ) => {
+    console.log("followUser followUser followUser");
+    console.log(req.body);
+
     try {
       const userId = req.user.userId;
       const followingUserId = req.body.followingUserId;
