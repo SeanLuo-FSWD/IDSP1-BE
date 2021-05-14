@@ -174,7 +174,10 @@ class UserModel {
     console.log(userId);
     console.log(updates);
 
-    updates.age = parseInt(updates.age);
+    if (updates.age) {
+      updates.age = parseInt(updates.age);
+    }
+
     const database = getDB();
     await database.collection("user").updateOne(
       {
