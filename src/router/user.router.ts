@@ -3,6 +3,7 @@ import AuthService from "../service/authentication.service";
 import { checkAuth } from "../middleware/authentication.middleware";
 import UserService from "../service/user.service";
 import multerUpload from "../middleware/multerUpload.middleware";
+import UserModel from "../model/user.model";
 
 declare global {
   namespace Express {
@@ -55,6 +56,8 @@ class UserRouter {
   private login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await this._authService.login(req, res, next);
+
+      await UserModel.updateLastLogin(result.userId);
       res.status(200).send(result);
     } catch (error) {
       next(error);

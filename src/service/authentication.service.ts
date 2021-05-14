@@ -33,8 +33,6 @@ class AuthenticationService {
             status: 404,
             message: "Invalid Email or Password.",
           });
-        console.log("444444444444444444");
-        console.log(user);
         if (!user.emailVerified)
           reject({
             status: 400,
@@ -50,6 +48,10 @@ class AuthenticationService {
               status: 500,
               message: "Login error.",
             });
+
+          console.log("88888888888888888888");
+          console.log("88888888888888888888");
+          console.log(user);
 
           resolve(user);
         });

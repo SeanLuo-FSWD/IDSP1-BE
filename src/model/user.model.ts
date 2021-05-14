@@ -26,6 +26,23 @@ class UserModel {
     this._createdAt = new Date().toString();
   }
 
+  static async updateLastLogin(id: any) {
+    console.log("updateLastLogin updateLastLogin updateLastLogin id");
+    console.log(id);
+    const database = getDB();
+
+    try {
+      await database.collection("user").updateOne(
+        {
+          _id: new ObjectId(id),
+        },
+        { $currentDate: { lastLogin: true } }
+      );
+    } catch (error) {
+      throw new Error("Error updating login timestamp");
+    }
+  }
+
   static async getPeople(filter: any, userId: string) {
     console.log("getPeople getPeople getPeople : filter");
     console.log(filter);
@@ -41,7 +58,7 @@ class UserModel {
       desired_users = await database
         .collection("user")
         .find()
-        .sort({ createdAt: -1 })
+        .sort({ lastLogin: -1, _id: -1 })
         .toArray();
     }
 
