@@ -29,7 +29,10 @@ class PeopleRouter {
 
     const filter = req.body;
     try {
-      const result = await this._peopleService.getPeople(filter);
+      const result = await this._peopleService.getPeople(
+        filter,
+        req.user.userId
+      );
       console.log(result);
       res.status(200).send(result);
     } catch (error) {

@@ -24,11 +24,11 @@ class PostRouter {
 
   private initializeRoutes() {
     this.router.post(
-      `/`,
+      `/create`,
       multerUpload.array("filesToUpload[]"),
       this.createPost
     );
-    this.router.get(`/`, this.getFeed);
+    this.router.post(`/`, this.getFeed);
 
     this.router.post(`/delete`, this.deletePost);
     this.router.get("/like/:postId", this.getLikesByPostId);
@@ -39,9 +39,10 @@ class PostRouter {
   private getFeed = async (req: Request, res: Response, next: NextFunction) => {
     console.log(`--- ${req.user.userId} get entire feed ---`);
     console.log(req.body);
+    const filter = req.body;
 
     try {
-      const result = await this._postService.getFeed(req.body);
+      const result = await this._postService.getFeed(filter, req);
       console.log(result);
       res.status(200).send(result);
     } catch (error) {

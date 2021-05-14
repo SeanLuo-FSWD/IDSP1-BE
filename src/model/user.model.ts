@@ -1,6 +1,7 @@
 import { getDB } from "../util/database.util";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
+import FilterHelper from "./_filter.helper";
 
 class UserModel {
   private _db = getDB();
@@ -25,20 +26,30 @@ class UserModel {
     this._createdAt = new Date().toString();
   }
 
-  static async getPeople(filter) {
-    const database = getDB();
-    const people = await database
-      .collection("user")
-      .find()
-      .sort({ createdAt: -1 })
-      .toArray();
+  static async getPeople(filter: any, userId: string) {
+    console.log("getPeople getPeople getPeople : filter");
+    console.log(filter);
+    console.log(userId);
+    let desired_users: any = [];
+
+    const filterHelper = new FilterHelper("user", filter, userId);
+
+    if (filter.applied) {
+      desired_users = filterHelper.applyFilter();
+    } else {
+      const database = getDB();
+      desired_users = await database
+        .collection("user")
+        .find()
+        .sort({ createdAt: -1 })
+        .toArray();
+    }
 
     console.log("2222222222222222");
-    console.log("getPeople user.model");
-    console.log(people);
+    console.log("getPeople user.model desired_users");
+    console.log(desired_users);
 
-    console.log("getPeople: all people", people);
-    return people;
+    return desired_users;
   }
   static async removeFirstTime(userId) {
     const query = { _id: new ObjectId(userId) };
@@ -146,6 +157,7 @@ class UserModel {
     console.log(userId);
     console.log(updates);
 
+    updates.age = parseInt(updates.age);
     const database = getDB();
     await database.collection("user").updateOne(
       {

@@ -3,8 +3,11 @@ import ImageModel from "../model/image.model";
 import LikeModel from "../model/like.model";
 
 class PostService {
-  public async getFeed(filter: any) {
-    const result = await PostModel.getFeed(filter);
+  public async getFeed(filter: any, req: any) {
+    console.log("PostService PostService PostService: filter.feedPg");
+    console.log(filter);
+
+    const result = await PostModel.getFeed(filter.feedPg, req.user);
     return result;
   }
 

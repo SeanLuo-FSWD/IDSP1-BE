@@ -4,8 +4,8 @@ import LikeModel from "../model/like.model";
 import UserModel from "../model/user.model";
 
 class PeopleService {
-  public async getPeople(filter: any) {
-    const result = await UserModel.getPeople(filter);
+  public async getPeople(filter: any, userId: string) {
+    const result = await UserModel.getPeople(filter, userId);
     return result;
   }
 

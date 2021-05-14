@@ -1,6 +1,7 @@
 import { getDB, client } from "../util/database.util";
 import { ObjectId } from "mongodb";
 import CommentModel from "./comment.model";
+import FilterHelper from "./_filter.helper";
 
 class PostModel {
   private _userId: string;
@@ -24,16 +25,27 @@ class PostModel {
     this._commentsCount = 0;
   }
 
-  static async getFeed(filter: any) {
-    const database = getDB();
-    const post = await database
-      .collection("post")
-      .find()
-      .sort({ createdAt: -1 })
-      .toArray();
+  static async getFeed(filter: any, user: any) {
+    console.log("getFeed getFeed getFeed : filter");
+    console.log(filter);
+    console.log(user);
+    let desired_posts: any = [];
 
-    console.log("getFeed: all posts", post);
-    return post;
+    const filterHelper = new FilterHelper("post", filter, user.userId);
+
+    if (filter.applied) {
+      desired_posts = filterHelper.applyFilter();
+    } else {
+      const database = getDB();
+      desired_posts = await database
+        .collection("post")
+        .find()
+        .sort({ createdAt: -1 })
+        .toArray();
+    }
+
+    // console.log("getFeed: all posts", post);
+    return desired_posts;
   }
 
   public async create() {
@@ -150,14 +162,37 @@ class PostModel {
     return post[0];
   };
 
+  //   static updateUserPostsAvatar = async (
+  //     postId: string,
+  //     newAvatarLink: string
+  //   ) => {
+  //     const database = getDB();
+  //     await database.collection("post").update(
+  //       {
+  //         _id: new ObjectId(postId),
+  //       },
+  //       {
+  //         $set: {
+  //           avatar: newAvatarLink,
+  //         },
+  //       }
+  //     );
+  //     return "success";
+  //   };
+
   static updateUserPostsAvatar = async (
-    postId: string,
+    userId: string,
     newAvatarLink: string
   ) => {
+    console.log("000000000000000000000");
+    console.log("updateUserPostsAvatar");
+    console.log(newAvatarLink);
+    console.log(userId);
+
     const database = getDB();
     await database.collection("post").update(
       {
-        _id: new ObjectId(postId),
+        userId: userId,
       },
       {
         $set: {

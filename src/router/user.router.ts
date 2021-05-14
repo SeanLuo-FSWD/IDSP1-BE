@@ -117,7 +117,10 @@ class UserRouter {
     try {
       const userId = req.user.userId;
       const updates = req.body;
-      console.log(req);
+      console.log(
+        "updateProfile updateProfile updateProfile: updates or req.body: "
+      );
+
       if (req.file) {
         updates.avatar = req.file;
       }
