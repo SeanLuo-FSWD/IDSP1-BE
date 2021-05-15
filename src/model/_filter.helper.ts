@@ -32,6 +32,7 @@ class FilterHelper {
 
   private async getPostCollection() {
     let post_arr_query = [];
+    let postCollection: any = [];
 
     if (this._filter.feed.keywords.length > 0) {
       post_arr_query.push(await this.postTextQuery(this._filter.feed.keywords));
@@ -40,9 +41,10 @@ class FilterHelper {
       post_arr_query.push(await { $match: { "images.0": { $exists: true } } });
     }
 
-    const postCollection = await this._db
+    postCollection = await this._db
       .collection("post")
-      .aggregate(post_arr_query);
+      .aggregate(post_arr_query)
+      .sort({ _id: -1 });
 
     return await postCollection.toArray();
   }
@@ -102,7 +104,8 @@ class FilterHelper {
     }
     const userCollection = await this._db
       .collection("user")
-      .aggregate(user_arr_query);
+      .aggregate(user_arr_query)
+      .sort({ lastLogin: -1, _id: -1 });
 
     return await userCollection.toArray();
   }
@@ -130,12 +133,16 @@ class FilterHelper {
         user_arr_ids.includes(p.userId)
       );
     } else {
-      const post_arr_userIds = matched_post_arr.map((p) => {
-        return p.userId;
-      });
-      return_arr = _.filter(matched_user_arr, (u) =>
-        post_arr_userIds.includes(u._id.toString())
-      );
+      if (this._filter.feed.keywords.length > 0 || this._filter.feed.hasImg) {
+        const post_arr_userIds = matched_post_arr.map((p) => {
+          return p.userId;
+        });
+        return_arr = _.filter(matched_user_arr, (u) =>
+          post_arr_userIds.includes(u._id.toString())
+        );
+      } else {
+        return_arr = matched_user_arr;
+      }
     }
 
     return return_arr;

@@ -98,6 +98,7 @@ class UserModel {
       gender: this._gender,
       location: this._location,
       createdAt: this._createdAt,
+      firstTime: true,
     });
 
     console.log("--- USER MODEL: inserted new user ---");
@@ -131,13 +132,14 @@ class UserModel {
     console.log("getByEmail&password: ", email);
     const database = getDB();
     let user = await database.collection("user").findOne({ email });
+
     console.log("getByEmail&password user: ", user);
+
     if (!user) return null;
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
-      //return user
       return {
         email: user.email,
         userId: user._id.toString(),
@@ -149,9 +151,6 @@ class UserModel {
         emailVerified: user.emailVerified,
         firstTime: user.firstTime,
       };
-
-      //   user = { ...user, userId: user._id.toString() };
-      //   return user;
     }
     return null;
   }
@@ -162,7 +161,6 @@ class UserModel {
     const result = await database.collection("user").updateOne(query, {
       $set: {
         emailVerified: true,
-        firstTime: true,
       },
     });
 
@@ -170,23 +168,22 @@ class UserModel {
   }
 
   static updateProfile = async (userId, updates) => {
-    console.log("55555555555555555");
-    console.log(userId);
-    console.log(updates);
+    if (updates && Object.keys(updates).length !== 0) {
+      if (updates.age) {
+        updates.age = parseInt(updates.age);
+      }
 
-    if (updates.age) {
-      updates.age = parseInt(updates.age);
+      const database = getDB();
+      await database.collection("user").updateOne(
+        {
+          _id: new ObjectId(userId),
+        },
+        {
+          $set: updates,
+        }
+      );
     }
 
-    const database = getDB();
-    await database.collection("user").updateOne(
-      {
-        _id: new ObjectId(userId),
-      },
-      {
-        $set: updates,
-      }
-    );
     return "success";
   };
 

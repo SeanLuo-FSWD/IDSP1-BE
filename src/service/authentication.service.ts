@@ -28,19 +28,10 @@ class AuthenticationService {
             message: err.message,
           });
         }
-        if (!user)
-          reject({
-            status: 404,
-            message: "Invalid Email or Password.",
-          });
-        if (!user.emailVerified)
-          reject({
-            status: 400,
-            message: "Email not verified.",
-          });
 
         //   reject(new Error("Email not verified."));
         //login is coded by passport, it writes the user information into session
+
         req.login(user, async (loginError) => {
           console.log("req login user", user);
           if (loginError)
@@ -48,10 +39,6 @@ class AuthenticationService {
               status: 500,
               message: "Login error.",
             });
-
-          console.log("88888888888888888888");
-          console.log("88888888888888888888");
-          console.log(user);
 
           resolve(user);
         });

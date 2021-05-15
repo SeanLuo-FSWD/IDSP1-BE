@@ -13,21 +13,22 @@ const localLogin = new LocalStrategy(
       console.log("auth", user);
 
       if (user) {
+        if (!user.emailVerified) {
+          return done({
+            message: "Your email is not verified, please check your link",
+          });
+        }
+
         if (user.firstTime) {
           await UserModel.removeFirstTime(user.userId);
         }
+
         return done(null, user);
       } else {
-        return done(null, false, {
+        return done({
           message: "Your login is invalid. Please try again",
         });
       }
-
-      //   return user
-      //     ? done(null, user)
-      //     : done(null, false, {
-      //         message: "Your login is invalid. Please try again",
-      //       });
     } catch (err) {
       console.log("auth err", err);
       done(err, false);
