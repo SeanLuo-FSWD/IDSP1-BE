@@ -48,11 +48,11 @@ class SocketIO {
     constructor(app) {
         this._server = http.createServer(app);
         this._io = new Server(this._server, {
-            cors: {
-                origin: "http://localhost:3000",
-                methods: ["GET", "POST"],
-                credentials: true
-            }
+            // cors: {
+            //     origin: "http://localhost:3000",
+            //     methods: ["GET", "POST"],
+            //     credentials: true
+            // }
         });
         this.initMiddlewares();
         this.ioMessage();
