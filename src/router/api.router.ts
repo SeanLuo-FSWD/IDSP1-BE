@@ -3,6 +3,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import UserRouter from './user.router';
 import PostRouter from './post.router';
 import CommentRouter from "../router/comment.router";
+import ConversationRouter from "./conversation.router";
 
 import { checkAuth } from '../middleware/authentication.middleware';
 import errorHandlingMiddleware from "../middleware/errorHandling.middleware";
@@ -16,7 +17,8 @@ class APIRouter {
     ];
     private authedSubRouters = [
         new PostRouter(),
-        new CommentRouter()
+        new CommentRouter(),
+        new ConversationRouter()
     ]
     constructor() {
         this.initRouters();

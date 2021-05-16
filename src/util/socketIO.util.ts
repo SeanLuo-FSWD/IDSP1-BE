@@ -1,21 +1,57 @@
 import http from "http";
 import { Server } from "socket.io";
-import session from "express-session";
 import passport from "../util/passport.util";
 import sessionMiddlware from "../middleware/session.middleware";
 
-let messages = [];
+import { getDB } from "../util/database.util";
+
+let messages = [
+    {
+        message_id: 2931,
+        userId: "60987e6611edb44e4eb364f7",
+        text: "Howdy?",
+        createdAt: "2020-10-19 15:00:00",
+        conversation_id: 1122
+    },
+    {
+        message_id: 3015,
+        userId: "60975d41228ec6290e156124",
+        text: "not bad!",
+        createdAt: "2020-10-20 19:00:00",
+        conversation_id: 1122
+    }
+];
+let conversations = [ 
+    {
+        conversation_id: 1122,
+        members: ["60987e6611edb44e4eb364f7", "60975d41228ec6290e156124"]
+    }
+];
+
+/** conversation
+ * @_id: string
+ * @members: [userId]
+ */
+
+/**
+ * message
+ * @conversation_id: string //fk to conversation
+ * @userId: string
+ * @text: string
+ * @createdAt: number
+ */
 
 class SocketIO {
     private _io;
     private _server;
-    private _users = [];
+    private _users = {};
     constructor(app) {
         this._server = http.createServer(app);
         this._io = new Server(this._server, {
             cors: {
                 origin: "http://localhost:3000",
-                methods: ["GET", "POST"]
+                methods: ["GET", "POST"],
+                credentials: true
             }
         });
         this.initMiddlewares();
@@ -39,8 +75,8 @@ class SocketIO {
     }
 
     initSocketAuth() {
-        console.log("init socket auth");
         this._io.use((socket, next) => {
+            console.log("socket auth session", socket.request.session);
             if (socket.request.user) {
                 next();
             } else {
@@ -55,64 +91,124 @@ class SocketIO {
             console.log("socket io connected");
 
             for (let [id, socket] of this._io.of("/").sockets) {
-                const isExisted = this._users.filter(user => user.userId === socket.request.user.userId);
-                if (!isExisted.length) {
-                    this._users.push({
+                const isExisted = this._users[socket.request.user.userId];
+                console.log("socekt id", id);
+                if (!isExisted) {
+                    this._users[socket.request.user.userId] = {
                         ...socket.request.user,
-                        id
-                    });
-                } else {
-                    const matchedUserIndex = this._users.indexOf(user => user.userId === socket.request.user.userId);
-                    console.log(matchedUserIndex);
-                    if (matchedUserIndex >= 0) {
-                        this._users[matchedUserIndex].id = id;
+                        id: socket.id
                     }
                 }
             }
 
-            console.log(this._users);
+            socket.on("enter chatroom", (data) => {
+                console.log("--- entering chatroom ---", data);
+                socket.join(data.conversationId);
+            });
 
-            socket.on('chat message', (msg) => {
-                console.log('message:', msg);
-                const msgObj = {
-                    text: msg.text,
-                    timeStamp: Date.now(),
-                    user: socket.request.user.userId
+            socket.on("activeUsers", () => {
+                console.log("see active users");
+                let activeUsers = [];
+                for (let userId in this._users) {
+                    activeUsers.push(this._users[userId])
                 }
-                let to;
+                socket.emit("activeUsers", activeUsers);
+            })
 
-                const matchedSender = this._users.filter(user => socket.request.user.userId === user.userId);
-                const matchedSenderId = matchedSender[0].id;
-                console.log("matchedSenderId", matchedSenderId)
+            socket.on("createChatroom", (joiner) => {
+                console.log("create chat room");
+            })
 
-                if (socket.request.user.userId === "60975d41228ec6290e156124") {
-                    const target = "60987e6611edb44e4eb364f7";
-                    const matchedUser = this._users.filter(user => user.userId === target);
-                    to = matchedUser[0].id;
-                } else {
-                    const target = "60975d41228ec6290e156124";
-                    const matchedUser = this._users.filter(user => user.userId === target);
-                    console.log("matchedUser: ", matchedUser);
-                    to = matchedUser[0].id;
+
+
+            socket.on('chat message', async (msg) => {
+                console.log("msg", msg)
+                const database = getDB();
+                const newMessage = {
+                    ...msg,
+                    createdAt: Date.now()
                 }
+                console.log("--- insert message into database ---");
+                await database.collection("message").insertOne(newMessage);
+                console.log("--- get messages in conversation ---");
+                const messages = await database.collection("message").find({ conversationId: msg.conversationId }).toArray();
+                console.log("emit message to frontend", messages);
+                this._io.to(msg.conversationId).emit("received", {messages});
+                
+                // const senderId = socket.request.user.userId;
+                // const receiverId = msg.to;
+
+                // let conversation;
+                // let matchedConversation = await conversations.filter(convo => convo.members.includes(senderId) && convo.members.includes(receiverId));
+                // console.log(matchedConversation);
+                // if (matchedConversation.length) {
+                //     conversation = matchedConversation[0];
+                // } else {
+                //     conversation = {
+                //         members: [receiverId, senderId],
+                //         _id: Date.now()
+                //     }
+                //     conversations.push(conversation);
+                // }
+
+                // const newMsg = {
+                //     conversation_id: conversation._id,
+                //     ...msg
+                // }
+
+                // //equals to put message into database.collection("message")
+                // messages.push(newMsg);
+
+                // const convoMessages = messages.filter(message => message.conversation_id === conversation._id);
+
+                // console.log(messages);
+
+                // const messageTargetUserId = msg.target;
+                
+                // const userTarget = this._users.filter(user => user.userId === messageTargetUserId);
+                // if (userTarget.length) {
+                //     const userTargetSocketId = userTarget[0].id;
+                // }
+                // console.log(userTarget[0]);
+                
+                
+                // console.log('message:', msg);
+                // const msgObj = {
+                //     text: msg.text,
+                //     timeStamp: Date.now(),
+                //     user: socket.request.user.userId
+                // }
+                // let to;
+
+                // const matchedSender = this._users.filter(user => socket.request.user.userId === user.userId);
+                // const matchedSenderId = matchedSender[0].id;
+                // console.log("matchedSenderId", matchedSenderId)
+
+                // if (socket.request.user.userId === "60975d41228ec6290e156124") {
+                //     const target = "60987e6611edb44e4eb364f7";
+                //     const matchedUser = this._users.filter(user => user.userId === target);
+                //     to = matchedUser[0].id;
+                // } else {
+                //     const target = "60975d41228ec6290e156124";
+                //     const matchedUser = this._users.filter(user => user.userId === target);
+                //     console.log("matchedUser: ", matchedUser);
+                //     to = matchedUser[0].id;
+                // }
                   
-                messages.push(msgObj);
-                console.log(messages);
-                console.log("message to ", to);
-
-                this._io.to(matchedSenderId).to(to).emit("received", messages);
+                // messages.push(msgObj);
+                // console.log(messages);
+                // console.log("message to ", to);
+       
+                // this._io.to(matchedSenderId).to(to).emit("received", messages);
             });
 
             socket.on("disconnect", () => {
-                const matchedUserIndex = this._users.indexOf(user => user.userId === socket.request.user.userId);
-                if (matchedUserIndex) {
-                    this._users.splice(matchedUserIndex, 1);
-                }
+                // const matchedUserIndex = this._users.indexOf(user => user.userId === socket.request.user.userId);
+                // if (matchedUserIndex) {
+                //     this._users.splice(matchedUserIndex, 1);
+                // }
             })
         });
-
-
-        
     }
 }
 

@@ -12,7 +12,8 @@ module.exports = (app) => {
     app.use(morgan("tiny"));
     app.use(cors({
       origin: "http://localhost:3000",
-      credentials: true
+      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+      credentials: true,
     }));
     app.use(sessionMiddlware);
     app.use(passport.initialize());
