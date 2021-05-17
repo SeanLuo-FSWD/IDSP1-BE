@@ -4,6 +4,8 @@ import passport from "../util/passport.util";
 import sessionMiddlware from "../middleware/session.middleware";
 
 import { getDB } from "../util/database.util";
+import { ObjectId } from "mongodb";
+import ConversationModel from "../model/conversation.model";
 
 let messages = [
     {
@@ -48,11 +50,11 @@ class SocketIO {
     constructor(app) {
         this._server = http.createServer(app);
         this._io = new Server(this._server, {
-            // cors: {
-            //     origin: "http://localhost:3000",
-            //     methods: ["GET", "POST"],
-            //     credentials: true
-            // }
+            cors: {
+                origin: "http://localhost:3000",
+                methods: ["GET", "POST"],
+                credentials: true
+            }
         });
         this.initMiddlewares();
         this.ioMessage();
@@ -98,6 +100,8 @@ class SocketIO {
                         ...socket.request.user,
                         id: socket.id
                     }
+                } else {
+                    this._users[socket.request.user.userId].id = socket.id;
                 }
             }
 
@@ -105,6 +109,11 @@ class SocketIO {
                 console.log("--- entering chatroom ---", data);
                 socket.join(data.conversationId);
             });
+
+            socket.on("leaveChatroom", (conversationId) => {
+                console.log(`--- leave room: ${conversationId} ---`);
+                socket.leave(conversationId);
+            })
 
             socket.on("activeUsers", () => {
                 console.log("see active users");
@@ -135,6 +144,24 @@ class SocketIO {
                 console.log("emit message to frontend", messages);
                 this._io.to(msg.conversationId).emit("received", {messages});
                 
+                //emit to chats list
+                const conversation = await database.collection("conversation").findOne({ 
+                    _id: new ObjectId(msg.conversationId)
+                });
+
+                const membersInConversation = conversation.members;
+                for (const conversationMember of membersInConversation) {
+                    const matchedUser = this._users[conversationMember.userId];
+                    console.log("conversationMemberId", conversationMember.userId);
+                    console.log("to socket id", matchedUser.id);
+                    
+                    const socketId = matchedUser.id;
+                    socket.to(socketId).emit("updateChats", msg);
+                    
+                }
+
+
+
                 // const senderId = socket.request.user.userId;
                 // const receiverId = msg.to;
 
