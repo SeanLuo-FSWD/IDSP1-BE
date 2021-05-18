@@ -1,11 +1,6 @@
-import { match } from "assert/strict";
 import ConversationModel from "../model/conversation.model";
 
 class ConversationService {
-    constructor() {
-
-    }
-
     public getConversationByConversationId = async (members) => {
         const matchedConversation = await ConversationModel.getConversationByMembers(members);
 
