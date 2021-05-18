@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
+import http from "http";
 
 import { connectDB } from "./src/util/database.util";
 
@@ -8,10 +9,13 @@ import APIRouter from './src/router/api.router';
 
 import errorHandlingMiddleware from "./src/middleware/errorHandling.middleware";
 
+import SocketIO from "./src/util/socketIO.util";
+
 class App {
     private _app: express.Application;
-    private readonly _port;
+    private readonly _port: string | number;
     private apiRouter = new APIRouter();
+    private _socketIO;
     
     constructor() {
         this._app = express();
@@ -21,13 +25,16 @@ class App {
         console.log(process.env.PORT);
         this._port = process.env.PORT || 8000;
         this.initErrorHandling();
+        this._socketIO = new SocketIO(this._app);
+        // this._socketIO.initServer();
     }
 
     public async startServer() {
         await connectDB();
-        this._app.listen(this._port , () => {
-            console.log(`App listening on ${this._port}.`)
-        })
+        this._socketIO.initServer();
+        // this._app.listen(this._port , () => {
+        //     console.log(`App listening on ${this._port}.`)
+        // })
     }
 
     public initializeMiddleWares() {
