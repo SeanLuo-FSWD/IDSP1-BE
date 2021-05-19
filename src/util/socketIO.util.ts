@@ -68,7 +68,9 @@ class SocketIO {
 
         console.log(room_status);
         console.log("--- entering chatroom ---", data);
-        socket.join(data.conversationId);
+        if (!room_status) {
+          socket.join(data.conversationId);
+        }
       });
 
       socket.on("leaveChatroom", (data) => {
