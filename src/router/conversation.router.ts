@@ -20,7 +20,7 @@ class ConversationRouter {
     }
 
     private getConversationIdByMembers = async (req: Request, res: Response, next: NextFunction) => {
-        console.log(req.body);
+  
         const target = req.body.target;
         const senderId = req.body.userId
         const membersInConversation = [...target, senderId];
@@ -37,11 +37,10 @@ class ConversationRouter {
     private getMessagesInConversation = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const conversationId = req.params.conversationId;
-            console.log(req.params);
-            console.log("get messages conversation Id", conversationId);
+
             const database = getDB();
             const messages = await database.collection("message").find({ conversationId: conversationId }).toArray();
-            console.log("get messages in conversation", messages);
+
             res.status(200).send({ messages });
         } catch(error) {
             next(error);
@@ -52,7 +51,7 @@ class ConversationRouter {
         try {
             const userId = req.user.userId;
             const conversations = await this._service.getAllConversationsByUserId(userId)
-            console.log("all conversation messages", conversations);
+
             const displayedConversations = conversations.filter(conversation => conversation.messages.length);
         
             res.status(200).send(displayedConversations);

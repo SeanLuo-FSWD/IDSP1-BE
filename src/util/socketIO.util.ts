@@ -77,6 +77,13 @@ class SocketIO {
                 socket.emit("activeUsers", activeUsers);
             })
 
+            socket.on("addNewMemberToGroup", async (data) => {
+                const conversationId = data.conversationId;
+                const newMembers = data.newMembers;
+                const result = await ConversationModel.addNewMembersToConversation(conversationId, newMembers);
+                this._io.to(conversationId).emit("addNewMemberToGroup", result);
+            })
+
             socket.on('chat message', async (msg) => {
                 console.log("incoming message", msg)
                 const database = getDB();
@@ -95,10 +102,12 @@ class SocketIO {
                 const membersInConversation = conversation.members;
                 for (const conversationMember of membersInConversation) {
                     const matchedUser = this._users[conversationMember.userId];
-                    const socketId = matchedUser.id;
-                    const latestConversations = await ConversationModel.getAllConversationsByUserId(matchedUser.userId);
-                    console.log(latestConversations)
-                    socket.to(socketId).emit("updateChats", latestConversations);
+                    if (matchedUser) {
+                        const socketId = matchedUser.id;
+                        const latestConversations = await ConversationModel.getAllConversationsByUserId(matchedUser.userId);
+                        console.log(latestConversations)
+                        socket.to(socketId).emit("updateChats", latestConversations);
+                    }
                 }
             });
 
