@@ -120,10 +120,11 @@ class SocketIO {
           const matchedUser = this._users[conversationMember.userId];
 
           if (matchedUser) {
-            // matchedUser will be undefined if they don't have chat open (not cached)
             const socketId = matchedUser.id;
-            socket.to(socketId).emit("updateChats", msg);
-          }
+            const latestConversations = await ConversationModel.getAllConversationsByUserId(matchedUser.userId);
+            console.log(latestConversations)
+            socket.to(socketId).emit("updateChats", latestConversations);
+        }
         }
       });
 
