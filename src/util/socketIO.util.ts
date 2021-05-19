@@ -67,6 +67,7 @@ class SocketIO {
         );
 
         console.log(room_status);
+        console.log("1111111111111111111111");
         console.log("--- entering chatroom ---", data);
         if (!room_status) {
           socket.join(data.conversationId);
@@ -90,6 +91,7 @@ class SocketIO {
       });
 
       socket.on("chat message", async (msg) => {
+        console.log("2222222222222222");
         console.log("incoming message", msg);
         const database = getDB();
         const newMessage = {
@@ -101,9 +103,6 @@ class SocketIO {
           .collection("message")
           .find({ conversationId: msg.conversationId })
           .toArray();
-
-        console.log("1111111111111111111111");
-        console.log("how many times this gets called for emit?");
 
         // this._io.to(msg.conversationId).emit("received", { messages });
 

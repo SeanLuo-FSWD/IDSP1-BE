@@ -15,18 +15,86 @@ class ConversationRouter {
 
   private initializeRoutes() {
     this.router.post("/", this.getConversationIdByMembers);
+    // this.router.post("/", this.createConversation);
     this.router.get("/:conversationId/message", this.getMessagesInConversation);
     this.router.get("/", this.getAllConversationsByUserId);
   }
+
+  private createConversation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const target = req.body.target;
+    const senderId = req.user.userId;
+    const membersInConversation = [...target, senderId];
+    const database = getDB();
+    try {
+      const matchedConversation = await database
+        .collection("conversation")
+        .find({
+          "members.userId": {
+            $all: membersInConversation,
+          },
+          members: {
+            $size: membersInConversation.length,
+          },
+        })
+        .toArray();
+
+      if (matchedConversation.length) {
+        res.status(200).send(matchedConversation[0]._id);
+      } else {
+        const memberObjectIds = membersInConversation.map(
+          (userId) => new ObjectId(userId)
+        );
+        const usersInConversation = await database
+          .collection("user")
+          .aggregate([
+            {
+              $match: {
+                _id: {
+                  $in: memberObjectIds,
+                },
+              },
+            },
+            {
+              $addFields: {
+                userId: {
+                  $toString: "$_id",
+                },
+              },
+            },
+            {
+              $project: {
+                userId: 1,
+                username: 1,
+                avatar: 1,
+              },
+            },
+          ])
+          .toArray();
+        const newConversation: { _id?: string; members: any[] } = {
+          members: usersInConversation,
+        };
+        await database.collection("conversation").insertOne(newConversation);
+        res.status(200).send(newConversation._id);
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
 
   private getConversationIdByMembers = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    console.log(req.body);
     const target = req.body.target;
-    const senderId = req.body.userId;
+
+    // const senderId = req.body.userId;
+    const senderId = req.user.userId;
+
     const membersInConversation = [...target, senderId];
 
     try {
