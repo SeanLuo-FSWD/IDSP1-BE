@@ -1,4 +1,5 @@
 import { getDB } from "../util/database.util";
+import { ObjectId } from "mongodb";
 
 interface IUserInConversation {
   userId: string;
@@ -129,16 +130,52 @@ class ConversationModel {
           },
         },
         {
-          $project: {
-            userId: 1,
-            username: 1,
-            avatar: 1,
-            _id: 0,
-          },
-        },
-      ])
-      .toArray();
-    return result;
-  };
+          "$project": {
+            "userId": 1,
+            "username": 1,
+            "avatar": 1,
+            "_id": 0
+          }
+        }
+        ]).toArray();
+        return result;
+    }
+
+    static addNewMembersToConversation = async (conversationId: string, newMembers: string[]) => {
+        const database = getDB();
+        const newMembersUserObjects = await database.collection("user").aggregate([
+            {
+                "$addFields": {
+                    "userId": {
+                        "$toString": "$_id"
+                    }
+                }
+            },
+            {
+                "$match": {
+                    "userId": {
+                        "$in": newMembers
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "userId": 1,
+                    "username": 1,
+                    "avatar": 1,
+                    "_id": 0
+                }
+            }
+        ]).toArray();
+        await database.collection("conversation").updateOne({
+            _id: new ObjectId(conversationId)
+        }, 
+        {
+            $push: {
+                members: newMembersUserObjects
+            }
+        })
+        return newMembersUserObjects;
+    }
 }
 export default ConversationModel;

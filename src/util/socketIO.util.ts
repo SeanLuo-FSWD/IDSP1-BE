@@ -7,8 +7,6 @@ import { getDB } from "../util/database.util";
 import { ObjectId } from "mongodb";
 import ConversationModel from "../model/conversation.model";
 
-import redis from "../util/redis.util";
-
 class SocketIO {
   private _io;
   private _server;
@@ -89,6 +87,13 @@ class SocketIO {
         }
         socket.emit("activeUsers", activeUsers);
       });
+
+      socket.on("addNewMemberToGroup", async (data) => {
+        const conversationId = data.conversationId;
+        const newMembers = data.newMembers;
+        const result = await ConversationModel.addNewMembersToConversation(conversationId, newMembers);
+        this._io.to(conversationId).emit("addNewMemberToGroup", result);
+    })
 
       socket.on("chat message", async (msg) => {
         console.log("2222222222222222");
