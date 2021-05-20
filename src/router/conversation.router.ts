@@ -18,6 +18,7 @@ class ConversationRouter {
     // this.router.post("/", this.createConversation);
     this.router.get("/:conversationId/message", this.getMessagesInConversation);
     this.router.get("/", this.getAllConversationsByUserId);
+    this.router.post("/person", this.getConversationByMembers);
   }
 
   private createConversation = async (
@@ -102,6 +103,25 @@ class ConversationRouter {
         membersInConversation
       );
       res.status(200).send(conversation._id);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  private getConversationByMembers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const senderId = req.user.userId;
+    const target = req.body.target;
+    const membersInConversation = [...target, senderId];
+    try {
+      const conversation = await this._service.getConversationByMembers(
+        membersInConversation
+      );
+      if (conversation) res.status(200).send(conversation._id);
+      else res.status(200).end();
     } catch (error) {
       next(error);
     }

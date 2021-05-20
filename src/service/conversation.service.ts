@@ -19,6 +19,17 @@ class ConversationService {
     }
   };
 
+  public getConversationByMembers = async (members) => {
+    const matchedConversation =
+      await ConversationModel.getConversationByMembers(members);
+
+    if (matchedConversation.length) {
+      return matchedConversation[0];
+    } else {
+      return null;
+    }
+  };
+
   public getAllConversationsByUserId = async (userId) => {
     console.log("conversation service.tssssss");
     console.log(userId);
