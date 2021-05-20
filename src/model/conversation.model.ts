@@ -172,7 +172,9 @@ class ConversationModel {
         }, 
         {
             $push: {
-                members: newMembersUserObjects
+                members: {
+                  $each: newMembersUserObjects
+                }
             }
         })
         return newMembersUserObjects;
