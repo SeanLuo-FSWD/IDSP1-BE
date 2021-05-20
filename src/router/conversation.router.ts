@@ -135,6 +135,10 @@ class ConversationRouter {
     res: Response,
     next: NextFunction
   ) => {
+    console.log(
+      "getAllConversationsByUserIdgetAllConversationsByUserIdgetAllConversationsByUserId"
+    );
+
     try {
       const userId = req.user.userId;
       const conversations = await this._service.getAllConversationsByUserId(
