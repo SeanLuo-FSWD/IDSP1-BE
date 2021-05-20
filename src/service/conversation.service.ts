@@ -9,7 +9,11 @@ class ConversationService {
         } else {
             const usersInConversation = await ConversationModel.getUsersInConversation(members);
             const newConversation = new ConversationModel(usersInConversation);
-            return newConversation.create();
+            const result = newConversation.create();
+            return {
+                ...result,
+                isNewConversation: true
+            }
         }
     }
 
