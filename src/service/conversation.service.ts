@@ -16,7 +16,6 @@ class ConversationService {
             }
         }
     }
-  };
 
   public getConversationByMembers = async (members) => {
     const matchedConversation =
