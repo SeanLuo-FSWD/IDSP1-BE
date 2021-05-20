@@ -10,17 +10,11 @@ class PeopleService {
   }
 
   public async getPerson(userId: string) {
-    console.log("getPerson UserId");
-    console.log(userId);
-
     const user = await UserModel.getUserById(userId);
     let posts = [];
     if (user) {
       posts = await PostModel.getPostsByUserId(user.userId);
     }
-    console.log("getPerson getPerson getPerson getPerson");
-    console.log(user);
-
     return { user: user, posts: posts };
   }
 }

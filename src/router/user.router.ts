@@ -65,14 +65,12 @@ class UserRouter {
   };
 
   private logout = (req: Request, res: Response) => {
-    console.log(`--- ${req.user.userId} logout ---`);
     req.logout();
 
     res.status(200).send({ message: "logout" });
   };
 
   private authenticate = (req: Request, res: Response) => {
-    console.log("--- authenticated user ---");
     res.status(200).send(req.user);
   };
 
@@ -82,9 +80,7 @@ class UserRouter {
     next: NextFunction
   ) => {
     try {
-      console.log("--- email verification ---");
       const userId = req.query.id;
-      console.log(userId);
       await this._authService.verifyEmail(userId);
       res.status(200).send({ message: "verified" });
     } catch (error) {
@@ -120,9 +116,6 @@ class UserRouter {
     try {
       const userId = req.user.userId;
       const updates = req.body;
-      console.log(
-        "updateProfile updateProfile updateProfile: updates or req.body: "
-      );
 
       if (req.file) {
         updates.avatar = req.file;
@@ -139,9 +132,6 @@ class UserRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log("followUser followUser followUser");
-    console.log(req.body);
-
     try {
       const userId = req.user.userId;
       const followingUserId = req.body.followingUserId;
@@ -157,8 +147,6 @@ class UserRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log("BE getFollowingUsers called");
-
     try {
       const result = await UserService.getFollowingUsers(req.user.userId);
       res.status(200).send(result);

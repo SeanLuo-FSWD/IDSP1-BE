@@ -11,7 +11,6 @@ class CommentService {
         }
 
         const result = await newComment.create();
-        console.log(result);
         return result;
     }
 

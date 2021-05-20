@@ -10,7 +10,6 @@ const localLogin = new LocalStrategy(
   async (email, password, done) => {
     try {
       const user = await UserModel.getByEmailAndPassword(email, password);
-      console.log("auth", user);
 
       if (user) {
         if (!user.emailVerified) {
@@ -30,7 +29,6 @@ const localLogin = new LocalStrategy(
         });
       }
     } catch (err) {
-      console.log("auth err", err);
       done(err, false);
     }
   }

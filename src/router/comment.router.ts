@@ -20,16 +20,13 @@ class CommentRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log(req.user);
     try {
       const user = req.user;
       const commentBody = req.body;
-      console.log("--- create comment ---");
       const result = await this._commentService.createComment(
         user,
         commentBody
       );
-      console.log("result", result);
       res.status(200).send(result);
     } catch (error) {
       next(error);
@@ -47,9 +44,6 @@ class CommentRouter {
 
       res.status(200).send({ comments: result });
     } catch (error) {
-      console.log("vvvvvvvvvvvvvvvvvvv");
-      console.log(error);
-
       next(error);
     }
   };

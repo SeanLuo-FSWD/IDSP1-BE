@@ -29,7 +29,6 @@ class UserService {
 
       updates.avatar = newAvatarLink;
     }
-    console.log(updates);
     await UserModel.updateProfile(userId, updates);
     if (updates["avatar"]) {
       await PostModel.updateUserPostsAvatar(userId, newAvatarLink);

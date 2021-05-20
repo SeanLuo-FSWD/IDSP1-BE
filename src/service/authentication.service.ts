@@ -29,11 +29,7 @@ class AuthenticationService {
           });
         }
 
-        //   reject(new Error("Email not verified."));
-        //login is coded by passport, it writes the user information into session
-
         req.login(user, async (loginError) => {
-          console.log("req login user", user);
           if (loginError)
             reject({
               status: 500,
@@ -50,7 +46,6 @@ class AuthenticationService {
     //signUpInfo: { email: .., password: .. }
     const user = new UserModel(signUpInfo);
     const isExisted = await user.isExisted();
-    console.log("isExisted", isExisted);
     if (isExisted) {
       throw {
         status: 400,

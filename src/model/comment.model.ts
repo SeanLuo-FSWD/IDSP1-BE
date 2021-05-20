@@ -31,7 +31,7 @@ class CommentModel {
       postId: this._postId,
       createdAt: this._createdAt,
     };
-    console.log("creating new comment");
+
     await this._db.collection("post").updateOne(
       // { id: new ObjectId(this._postId) },
       { _id: new ObjectId(this._postId) },
@@ -53,11 +53,7 @@ class CommentModel {
       .find({ postId: postId })
       .sort({ createdAt: -1 })
       .toArray();
-
-    console.log("bbbbbbbbbbbbbbbbbb");
-    console.log(postId);
-
-    console.log(comments);
+      
     return comments;
   }
 

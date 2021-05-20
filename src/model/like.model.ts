@@ -27,9 +27,6 @@ class LikeModel {
   static getLikesByPostId = async (postId) => {
     const database = getDB();
     const result = await database.collection("like").find({ postId }).toArray();
-    console.log("getLikesByPostId getLikesByPostId getLikesByPostId");
-    console.log(result);
-
     return result;
   };
 
