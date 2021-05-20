@@ -10,6 +10,7 @@ module.exports = (app) => {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     app.use(morgan("tiny"));
+    //need to be cleanedup for deployment
     app.use(cors(
       {
         origin: "http://localhost:3000",

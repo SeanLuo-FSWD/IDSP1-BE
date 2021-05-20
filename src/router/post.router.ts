@@ -37,13 +37,10 @@ class PostRouter {
   }
 
   private getFeed = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(`--- ${req.user.userId} get entire feed ---`);
-    console.log(req.body);
     const filter = req.body;
 
     try {
       const result = await this._postService.getFeed(filter, req);
-      console.log(result);
       res.status(200).send(result);
     } catch (error) {
       next(error);
@@ -55,10 +52,8 @@ class PostRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log(`--- ${req.user.userId} creating post ---`);
     try {
       const result = await this._postService.createPost(req);
-      console.log(result);
       res.status(200).send(result);
     } catch (error) {
       next(error);
@@ -70,18 +65,12 @@ class PostRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log("--- Delete Post ---");
     try {
-      console.log("req.body");
-      console.log(req.body);
-
       const userId = req.user.userId;
       const postId = req.body.postId;
-      console.log("delete post router: postId ", postId);
       await this._postService.deletePost(userId, postId);
       res.status(200).send({ message: "success" });
     } catch (error) {
-      console.log("delete post router", error);
       next(error);
     }
   };
@@ -91,7 +80,6 @@ class PostRouter {
     res: Response,
     next: NextFunction
   ) => {
-    console.log("toggle like post router");
     try {
       const user = req.user;
       const postId = req.body.postId;

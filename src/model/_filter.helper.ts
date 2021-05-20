@@ -116,13 +116,6 @@ class FilterHelper {
 
     const matched_user_arr = await this.getUserCollection();
     let return_arr;
-    console.log("88888888888888888888");
-    console.log("matched_post_arr");
-    console.log(matched_post_arr);
-
-    console.log("88888888888888888888");
-    console.log("matched_user_arr");
-    console.log(matched_user_arr);
 
     if (this._return_col === "post") {
       const user_arr_ids = matched_user_arr.map((u) => {

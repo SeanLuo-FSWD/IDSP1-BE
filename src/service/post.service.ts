@@ -4,9 +4,6 @@ import LikeModel from "../model/like.model";
 
 class PostService {
   public async getFeed(filter: any, req: any) {
-    console.log("PostService PostService PostService: filter.feedPg");
-    console.log(filter);
-
     const result = await PostModel.getFeed(filter.feedPg, req.user);
     return result;
   }
@@ -30,7 +27,6 @@ class PostService {
       : [];
 
     const post = new PostModel(user, postData);
-    console.log(post);
     const result = await post.create();
 
     return result;
@@ -38,14 +34,12 @@ class PostService {
 
   public async deletePost(userId, postId) {
     const result = await PostModel.delete(userId, postId);
-    console.log("delete service result", result);
     if (result) {
       return {
         status: 200,
         message: "success",
       };
     }
-    console.log("delete post service error");
     throw {
       status: 404,
       message: "Post not found.",
@@ -54,10 +48,7 @@ class PostService {
 
   static async toggleLikePost(user, postId) {
     const post = await PostModel.getPostByPostId(postId);
-    console.log("eeeeeeeeeeeeeeeeeeeeee");
-    console.log(postId);
     if (!post) {
-      console.log("fffffffffffffffffffffff");
 
       throw {
         status: 404,
@@ -66,7 +57,6 @@ class PostService {
     }
 
     const result = await PostModel.togglePostLike(user, postId);
-    console.log("---POST SERVICE: toggleLikePost result", result);
     return result;
   }
 

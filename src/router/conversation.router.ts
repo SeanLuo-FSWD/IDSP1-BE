@@ -82,8 +82,6 @@ class ConversationRouter {
   ) => {
     try {
       const conversationId = req.params.conversationId;
-      console.log(req.params);
-      console.log("get messages conversation Id", conversationId);
       const database = getDB();
       const messages = await database
         .collection("message")
@@ -91,7 +89,6 @@ class ConversationRouter {
         .limit(5)
         .sort({ _id: -1 })
         .toArray();
-      console.log("get messages in conversation", messages);
       res.status(200).send({ messages });
     } catch (error) {
       next(error);
@@ -112,7 +109,6 @@ class ConversationRouter {
       const conversations = await this._service.getAllConversationsByUserId(
         userId
       );
-      console.log("all conversation messages", conversations);
       const displayedConversations = conversations.filter(
         (conversation) => conversation.messages.length
       );

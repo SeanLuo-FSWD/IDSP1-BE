@@ -29,12 +29,11 @@ class SocketIO {
 
   initServer = () => {
     this._server.listen(8000, () => {
-      console.log("listening");
+      console.log("server listening");
     });
   };
 
   initMiddlewares() {
-    console.log("init socket middleware");
     this._io.use(this.wrap(sessionMiddlware));
     this._io.use(this.wrap(passport.initialize()));
     this._io.use(this.wrap(passport.session()));
@@ -42,7 +41,6 @@ class SocketIO {
       if (socket.request.user) {
         next();
       } else {
-        console.log("not authorized");
         // next(new Error("Unauthorized"));
         socket.disconnect();
       }
@@ -51,7 +49,6 @@ class SocketIO {
 
   private ioMessage = () => {
     this._io.on("connection", (socket) => {
-      console.log("socket io connected");
       const socketUser = socket.request.user;
       //user and correspond socket id caching
       this.cacheUser(socketUser);
@@ -64,23 +61,16 @@ class SocketIO {
           data.conversationId
         );
 
-        console.log(room_status);
-        console.log("1111111111111111111111");
-        console.log("--- entering chatroom ---", data);
         if (!room_status) {
           socket.join(data.conversationId);
         }
       });
 
       socket.on("leaveChatroom", (data) => {
-        console.log(`--- leave room: ${data.conversationId} ---`);
-        console.log(data);
-
         socket.leave(data.conversationId);
       });
 
       socket.on("activeUsers", () => {
-        console.log("see active users");
         let activeUsers = [];
         for (let userId in this._users) {
           activeUsers.push(this._users[userId]);
@@ -105,23 +95,16 @@ class SocketIO {
       });
 
       socket.on("chat message", async (msg) => {
-        console.log("2222222222222222");
-        console.log("incoming message", msg);
         const database = getDB();
         const newMessage = {
           ...msg,
           createdAt: Date.now(),
         };
         await database.collection("message").insertOne(newMessage);
-        const messages = await database
-          .collection("message")
-          .find({ conversationId: msg.conversationId })
-          .toArray();
-
         // this._io.to(msg.conversationId).emit("received", { messages });
 
         this._io.to(msg.conversationId).emit("received", {
-          newMsg: [messages[messages.length - 1]],
+          newMsg: newMessage
         });
 
         //emit to chats list
@@ -140,6 +123,7 @@ class SocketIO {
                 matchedUser.userId
               );
             console.log(latestConversations);
+
             socket.to(socketId).emit("updateChats", latestConversations);
           }
         }
@@ -147,8 +131,6 @@ class SocketIO {
 
       socket.on("disconnect", (socket) => {
         delete this._users[socketUser.userId];
-        console.log("--- disconnect : ", socketUser);
-        console.log("--- active users: ", this._users);
       });
     });
   };
@@ -156,7 +138,6 @@ class SocketIO {
   private cacheUser = async (user) => {
     for (let [id, socket] of this._io.of("/").sockets) {
       const isExisted = this._users[user.userId];
-      console.log("socekt id", id);
       if (!isExisted) {
         this._users[socket.request.user.userId] = {
           ...socket.request.user,

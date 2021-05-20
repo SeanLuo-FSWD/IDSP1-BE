@@ -24,11 +24,6 @@ class ConversationModel {
 
   static getConversationByMembers = async (memberIds: string[]) => {
     const database = getDB();
-
-    console.log("memberIds memberIds");
-
-    console.log(memberIds);
-
     const result = await database
       .collection("conversation")
       .find({
@@ -146,12 +141,6 @@ class ConversationModel {
   };
 
   static getUsersInConversation = async (members) => {
-    console.log(
-      "getUsersInConversationgetUsersInConversationgetUsersInConversation"
-    );
-    console.log("members members members");
-    console.log(members);
-
     const database = getDB();
     const result = await database
       .collection("user")

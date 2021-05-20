@@ -27,8 +27,6 @@ class UserModel {
   }
 
   static async updateLastLogin(id: any) {
-    console.log("updateLastLogin updateLastLogin updateLastLogin id");
-    console.log(id);
     const database = getDB();
 
     try {
@@ -44,9 +42,6 @@ class UserModel {
   }
 
   static async getPeople(filter: any, userId: string) {
-    console.log("getPeople getPeople getPeople : filter");
-    console.log(filter);
-    console.log(userId);
     let desired_users: any = [];
 
     const filterHelper = new FilterHelper("user", filter, userId);
@@ -97,8 +92,6 @@ class UserModel {
       firstTime: true,
     });
 
-    console.log("--- USER MODEL: inserted new user ---");
-
     return {
       email: this._email,
       userId: result.insertedId,
@@ -125,11 +118,8 @@ class UserModel {
   }
 
   static async getByEmailAndPassword(email: string, password: string) {
-    console.log("getByEmail&password: ", email);
     const database = getDB();
     let user = await database.collection("user").findOne({ email });
-
-    console.log("getByEmail&password user: ", user);
 
     if (!user) return null;
 

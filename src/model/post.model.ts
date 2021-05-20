@@ -26,9 +26,6 @@ class PostModel {
   }
 
   static async getFeed(filter: any, user: any) {
-    console.log("getFeed getFeed getFeed : filter");
-    console.log(filter);
-    console.log(user);
     let desired_posts: any = [];
 
     const filterHelper = new FilterHelper("post", filter, user.userId);
@@ -43,8 +40,7 @@ class PostModel {
         .sort({ _id: -1 })
         .toArray();
     }
-
-    // console.log("getFeed: all posts", post);
+    
     return desired_posts;
   }
 
@@ -61,7 +57,7 @@ class PostModel {
     };
 
     const result = await this._db.collection("post").insertOne(newPost);
-    console.log("newPost", newPost);
+
     //Figure out what to return here
     return newPost;
   }
@@ -113,12 +109,6 @@ class PostModel {
       .sort({ createdAt: -1 })
       .toArray();
 
-    console.log(
-      "getPostsByUserId getPostsByUserId getPostsByUserId getPostsByUserId"
-    );
-
-    console.log(posts);
-
     return posts;
   };
 
@@ -131,7 +121,6 @@ class PostModel {
   };
 
   static getFullPostByPostId = async (postId: string) => {
-    console.log("get full post model", postId);
     const database = getDB();
     const post = await database
       .collection("post")
@@ -158,36 +147,13 @@ class PostModel {
       ])
       .toArray();
 
-    console.log("aggregate", post);
     return post[0];
   };
-
-  //   static updateUserPostsAvatar = async (
-  //     postId: string,
-  //     newAvatarLink: string
-  //   ) => {
-  //     const database = getDB();
-  //     await database.collection("post").update(
-  //       {
-  //         _id: new ObjectId(postId),
-  //       },
-  //       {
-  //         $set: {
-  //           avatar: newAvatarLink,
-  //         },
-  //       }
-  //     );
-  //     return "success";
-  //   };
 
   static updateUserPostsAvatar = async (
     userId: string,
     newAvatarLink: string
   ) => {
-    console.log("000000000000000000000");
-    console.log("updateUserPostsAvatar");
-    console.log(newAvatarLink);
-    console.log(userId);
 
     const database = getDB();
     await database.collection("post").update(
