@@ -62,10 +62,6 @@ class UserModel {
         .toArray();
     }
 
-    console.log("2222222222222222");
-    console.log("getPeople user.model desired_users");
-    console.log(desired_users);
-
     return desired_users;
   }
   static async removeFirstTime(userId) {

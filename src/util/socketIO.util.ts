@@ -60,13 +60,25 @@ class SocketIO {
 
       //user enter chatroom
       socket.on("enter chatroom", (data) => {
+        // const room_status = socket.rooms.indexOf(data.conversationId) >= 0;
+
+        const room_status = Object.keys(socket.rooms).includes(
+          data.conversationId
+        );
+
+        console.log(room_status);
+        console.log("1111111111111111111111");
         console.log("--- entering chatroom ---", data);
-        socket.join(data.conversationId);
+        if (!room_status) {
+          socket.join(data.conversationId);
+        }
       });
 
-      socket.on("leaveChatroom", (conversationId) => {
-        console.log(`--- leave room: ${conversationId} ---`);
-        socket.leave(conversationId);
+      socket.on("leaveChatroom", (data) => {
+        console.log(`--- leave room: ${data.conversationId} ---`);
+        console.log(data);
+
+        socket.leave(data.conversationId);
       });
 
       socket.on("activeUsers", () => {
@@ -79,6 +91,7 @@ class SocketIO {
       });
 
       socket.on("chat message", async (msg) => {
+        console.log("2222222222222222");
         console.log("incoming message", msg);
         const database = getDB();
         const newMessage = {
@@ -90,7 +103,13 @@ class SocketIO {
           .collection("message")
           .find({ conversationId: msg.conversationId })
           .toArray();
-        this._io.to(msg.conversationId).emit("received", { messages });
+
+        // this._io.to(msg.conversationId).emit("received", { messages });
+
+        this._io.to(msg.conversationId).emit("received", {
+          newMsg: [messages[messages.length - 1]],
+        });
+
         //emit to chats list
         const conversation = await database.collection("conversation").findOne({
           _id: new ObjectId(msg.conversationId),
@@ -100,12 +119,14 @@ class SocketIO {
         for (const conversationMember of membersInConversation) {
           const matchedUser = this._users[conversationMember.userId];
 
-          // const socketId = matchedUser.id;
-          // socket.to(socketId).emit("updateChats", msg);
-
           if (matchedUser) {
             const socketId = matchedUser.id;
-            socket.to(socketId).emit("updateChats", msg);
+            const latestConversations =
+              await ConversationModel.getAllConversationsByUserId(
+                matchedUser.userId
+              );
+            console.log(latestConversations);
+            socket.to(socketId).emit("updateChats", latestConversations);
           }
         }
       });
