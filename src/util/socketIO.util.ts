@@ -91,6 +91,12 @@ class SocketIO {
       socket.on("addNewMemberToGroup", async (data) => {
         const conversationId = data.conversationId;
         const newMembers = data.newMembers;
+        console.log("1111111111111111111111");
+        console.log("conversationId");
+        console.log(conversationId);
+        console.log("newMembers");
+        console.log(newMembers);
+
         const result = await ConversationModel.addNewMembersToConversation(
           conversationId,
           newMembers

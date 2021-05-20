@@ -100,6 +100,8 @@ class ConversationModel {
 
     console.log("displayedConversations");
     console.log("1111111111111111111111");
+    console.log(result);
+
     console.log(displayedConversations);
 
     if (displayedConversations.length > 0) {
@@ -185,6 +187,12 @@ class ConversationModel {
     conversationId: string,
     newMembers: string[]
   ) => {
+    console.log(
+      "addNewMembersToConversation addNewMembersToConversation addNewMembersToConversation"
+    );
+
+    console.log(newMembers);
+
     const database = getDB();
     const newMembersUserObjects = await database
       .collection("user")
@@ -219,15 +227,12 @@ class ConversationModel {
       },
       {
         $push: {
-          members: newMembersUserObjects,
+          members: {
+            $each: newMembersUserObjects,
+          },
         },
       }
     );
-    console.log(
-      "newMembersUserObjects newMembersUserObjects newMembersUserObjects"
-    );
-    console.log(newMembersUserObjects);
-
     return newMembersUserObjects;
   };
 }
