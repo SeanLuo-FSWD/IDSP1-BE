@@ -1,21 +1,20 @@
 import ConversationModel from "../model/conversation.model";
 
 class ConversationService {
-  public getConversationByConversationId = async (members) => {
-    console.log("eeeeeeeeeeeeeeeeeeeeee");
-    console.log("eeeeeeeeeeeeeeeeeeeeee");
-    console.log(members);
+    public getConversationByConversationId = async (members) => {
+        const matchedConversation = await ConversationModel.getConversationByMembers(members);
 
-    const matchedConversation =
-      await ConversationModel.getConversationByMembers(members);
-
-    if (matchedConversation.length) {
-      return matchedConversation[0];
-    } else {
-      const usersInConversation =
-        await ConversationModel.getUsersInConversation(members);
-      const newConversation = new ConversationModel(usersInConversation);
-      return newConversation.create();
+        if (matchedConversation.length) {
+            return matchedConversation[0];
+        } else {
+            const usersInConversation = await ConversationModel.getUsersInConversation(members);
+            const newConversation = new ConversationModel(usersInConversation);
+            const result = newConversation.create();
+            return {
+                ...result,
+                isNewConversation: true
+            }
+        }
     }
   };
 
