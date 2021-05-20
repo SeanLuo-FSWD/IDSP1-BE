@@ -36,6 +36,11 @@ class ConversationModel {
       })
       .toArray();
     /** result = conversation[] */
+
+    console.log("getConversationByMembers in conversation.model.ts");
+    console.log("is this returning by inclusion?");
+    console.log(result);
+
     return result;
   };
 
@@ -85,9 +90,42 @@ class ConversationModel {
         },
       ])
       .toArray();
-    const displayedConversations = result.filter(
-      (conversation) => conversation.messages.length
-    );
+
+    let displayedConversations = result;
+
+    console.log("displayedConversations");
+    console.log("1111111111111111111111");
+    console.log(result);
+
+    console.log(displayedConversations);
+
+    if (displayedConversations.length > 0) {
+      //   displayedConversations = result.filter((conversation) => {
+      //     conversation.messages.length;
+      //   });
+
+      displayedConversations = result.filter((conversation) => {
+        console.log(conversation.messages.length);
+
+        return conversation.messages.length > 0;
+      });
+
+      console.log("2222222222222222");
+      console.log(displayedConversations);
+
+      displayedConversations.sort((a, b) => {
+        const a_date: any = new Date(a.messages[0].createdAt);
+        const b_date: any = new Date(b.messages[0].createdAt);
+
+        return b_date - a_date;
+      });
+
+      console.log("3333333333333333");
+      console.log(displayedConversations);
+    }
+    console.log("444444444444444444");
+    console.log(displayedConversations);
+
     return displayedConversations;
   };
 
@@ -122,54 +160,69 @@ class ConversationModel {
           },
         },
         {
-          "$project": {
-            "userId": 1,
-            "username": 1,
-            "avatar": 1,
-            "_id": 0
-          }
-        }
-        ]).toArray();
-        return result;
-    }
+          $project: {
+            userId: 1,
+            username: 1,
+            avatar: 1,
+            _id: 0,
+          },
+        },
+      ])
+      .toArray();
+    return result;
+  };
 
-    static addNewMembersToConversation = async (conversationId: string, newMembers: string[]) => {
-        const database = getDB();
-        const newMembersUserObjects = await database.collection("user").aggregate([
-            {
-                "$addFields": {
-                    "userId": {
-                        "$toString": "$_id"
-                    }
-                }
-            },
-            {
-                "$match": {
-                    "userId": {
-                        "$in": newMembers
-                    }
-                }
-            },
-            {
-                "$project": {
-                    "userId": 1,
-                    "username": 1,
-                    "avatar": 1,
-                    "_id": 0
-                }
-            }
-        ]).toArray();
-        await database.collection("conversation").updateOne({
-            _id: new ObjectId(conversationId)
-        }, 
+  static addNewMembersToConversation = async (
+    conversationId: string,
+    newMembers: string[]
+  ) => {
+    console.log(
+      "addNewMembersToConversation addNewMembersToConversation addNewMembersToConversation"
+    );
+
+    console.log(newMembers);
+
+    const database = getDB();
+    const newMembersUserObjects = await database
+      .collection("user")
+      .aggregate([
         {
-            $push: {
-                members: {
-                  $each: newMembersUserObjects
-                }
-            }
-        })
-        return newMembersUserObjects;
-    }
+          $addFields: {
+            userId: {
+              $toString: "$_id",
+            },
+          },
+        },
+        {
+          $match: {
+            userId: {
+              $in: newMembers,
+            },
+          },
+        },
+        {
+          $project: {
+            userId: 1,
+            username: 1,
+            avatar: 1,
+            _id: 0,
+          },
+        },
+      ])
+      .toArray();
+    await database.collection("conversation").updateOne(
+      {
+        _id: new ObjectId(conversationId),
+      },
+      {
+        $push: {
+          members: {
+            $each: newMembersUserObjects,
+          },
+        },
+      }
+    );
+    return newMembersUserObjects;
+  };
 }
 export default ConversationModel;
