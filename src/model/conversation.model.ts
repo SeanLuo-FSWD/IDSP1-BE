@@ -15,8 +15,9 @@ class ConversationModel {
   }
 
   public create = async () => {
-    const newConversation: { _id?: string; members: string[] } = {
+    const newConversation: { _id?: string; members: string[], createdAt: number } = {
       members: this._members,
+      createdAt: Date.now()
     };
     await this._db.collection("conversation").insertOne(newConversation);
     return newConversation;
@@ -60,6 +61,7 @@ class ConversationModel {
               $toString: "$_id",
             },
             _id: 0,
+            createdAt: 1
           },
         },
         {
@@ -77,15 +79,10 @@ class ConversationModel {
             ],
             as: "messages",
           },
-        },
-        {
-          $match: {
-            messages: { $exists: true },
-          },
-        },
+        }
       ])
       .toArray();
-
+      console.log("--- get conversation by user Id ---", result);
     let displayedConversations = result;
 
 
@@ -107,7 +104,7 @@ class ConversationModel {
       });
     }
 
-    return displayedConversations;
+    return result;
   };
 
   static getMessagesInConversation = async (conversationId) => {
