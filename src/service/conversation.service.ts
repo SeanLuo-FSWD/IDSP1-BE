@@ -30,9 +30,6 @@ class ConversationService {
   };
 
   public getAllConversationsByUserId = async (userId) => {
-    console.log("conversation service.tssssss");
-    console.log(userId);
-
     const conversations = await ConversationModel.getAllConversationsByUserId(
       userId
     );

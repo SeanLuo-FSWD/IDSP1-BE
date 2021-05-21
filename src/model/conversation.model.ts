@@ -36,11 +36,6 @@ class ConversationModel {
       })
       .toArray();
     /** result = conversation[] */
-
-    console.log("getConversationByMembers in conversation.model.ts");
-    console.log("is this returning by inclusion?");
-    console.log(result);
-
     return result;
   };
 
@@ -93,11 +88,6 @@ class ConversationModel {
 
     let displayedConversations = result;
 
-    console.log("displayedConversations");
-    console.log("1111111111111111111111");
-    console.log(result);
-
-    console.log(displayedConversations);
 
     if (displayedConversations.length > 0) {
       //   displayedConversations = result.filter((conversation) => {
@@ -105,13 +95,9 @@ class ConversationModel {
       //   });
 
       displayedConversations = result.filter((conversation) => {
-        console.log(conversation.messages.length);
 
         return conversation.messages.length > 0;
       });
-
-      console.log("2222222222222222");
-      console.log(displayedConversations);
 
       displayedConversations.sort((a, b) => {
         const a_date: any = new Date(a.messages[0].createdAt);
@@ -119,12 +105,7 @@ class ConversationModel {
 
         return b_date - a_date;
       });
-
-      console.log("3333333333333333");
-      console.log(displayedConversations);
     }
-    console.log("444444444444444444");
-    console.log(displayedConversations);
 
     return displayedConversations;
   };
@@ -176,12 +157,6 @@ class ConversationModel {
     conversationId: string,
     newMembers: string[]
   ) => {
-    console.log(
-      "addNewMembersToConversation addNewMembersToConversation addNewMembersToConversation"
-    );
-
-    console.log(newMembers);
-
     const database = getDB();
     const newMembersUserObjects = await database
       .collection("user")

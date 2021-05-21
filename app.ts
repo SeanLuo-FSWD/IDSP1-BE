@@ -26,15 +26,11 @@ class App {
         this._port = process.env.PORT || 8000;
         this.initErrorHandling();
         this._socketIO = new SocketIO(this._app);
-        // this._socketIO.initServer();
     }
 
     public async startServer() {
         await connectDB();
         this._socketIO.initServer();
-        // this._app.listen(this._port , () => {
-        //     console.log(`App listening on ${this._port}.`)
-        // })
     }
 
     public initializeMiddleWares() {
