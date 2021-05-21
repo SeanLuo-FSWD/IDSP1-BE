@@ -13,7 +13,7 @@ async function sendEmail(receiverEmail: string, verificationLink) {
       from: `"idsp.townsquare" juiyigung@hotmail.com`,
       to: receiverEmail,
       subject: "TownSquare Verification",
-      html: `<p>Please click on the following link to verify your email: http://localhost:3000/api/user/verify?id=${verificationLink}</p>`,
+      html: `<p>Please click on the following link to verify your email: http://34.145.97.81/api/user/verify?id=${verificationLink}</p>`,
     });
   } catch (err) {
     console.log(err);
