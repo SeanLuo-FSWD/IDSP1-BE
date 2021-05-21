@@ -46,7 +46,7 @@ class ConversationRouter {
       const conversation = await this._service.getConversationByConversationId(
         membersInConversation
       );
-      res.status(200).send(conversation._id);
+      res.status(200).send(conversation);
     } catch (error) {
       next(error);
     }
