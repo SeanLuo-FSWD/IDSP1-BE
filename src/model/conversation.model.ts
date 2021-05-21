@@ -77,14 +77,33 @@ class ConversationModel {
               { $sort: { createdAt: -1 } },
               { $limit: 1 },
             ],
-            as: "messages",
+            as: "latestMessage",
           },
+        },
+        {
+          $addFields: {
+            "orderTimeStamp": {
+              $cond: {
+                if: {
+                  $anyElementTrue: "$latestMessage"
+                },
+                then: {
+                  $arrayElemAt: ["$latestMessage.createdAt", 0]
+                },
+                else: "$createdAt"
+              }
+            }
+          }
+        },
+        {
+          $sort: {
+            "orderTimeStamp": -1
+          }
         }
       ])
       .toArray();
       console.log("--- get conversation by user Id ---", result);
     let displayedConversations = result;
-
 
     if (displayedConversations.length > 0) {
       //   displayedConversations = result.filter((conversation) => {
@@ -104,7 +123,7 @@ class ConversationModel {
       });
     }
 
-    return result;
+    return displayedConversations;
   };
 
   static getMessagesInConversation = async (conversationId) => {
