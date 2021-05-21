@@ -1,10 +1,10 @@
 echo "DEPLOYMENT STARTED";
-if [ -d "../idsp2-chat" ] 
+if [ -d "../idsp2-chat-react" ] 
 then
-    rm -r ../idsp2-chat;
+    rm -r ../idsp2-chat-react;
     cd ..;
-    git clone git@github.com:kjohnathan/idsp2-chat.git;
-    cd idsp2-chat;
+    git clone git@github.com:kjohnathan/idsp2-chat-react.git;
+    cd idsp2-chat-react;
     npm install;
     npm run build;
 
@@ -19,8 +19,8 @@ then
     fi 
 else 
     cd ..
-    git clone git@github.com:kjohnathan/idsp2-chat.git;
-    cd idsp2-chat;
+    git clone git@github.com:kjohnathan/idsp2-chat-react.git;
+    cd idsp2-chat-react;
     npm install;
     npm run build;
 
