@@ -5,6 +5,7 @@ import CommentModel from "../model/comment.model";
 import ImageModel from "../model/image.model";
 import FollowingModels from "../model/following.model";
 import FollowingModel from "../model/following.model";
+import NotificationModel from "../model/notification.model";
 
 class UserService {
   static updateUserAvatar = async (userId, image) => {
@@ -40,12 +41,31 @@ class UserService {
     return result;
   };
 
-  static followUser = async (userId, followingUserId) => {
+  static followUser = async (user, followingUserId) => {
     const result = await new FollowingModel(
-      userId,
+      user.userId,
       followingUserId
     ).toggleFollowing();
-    return result;
+
+    let notification_result = null;
+
+    if (result === "followed") {
+      const message = `${user.username} has followed you`;
+      const link = `/person/${user.userId}`;
+      const notification = new NotificationModel(
+        followingUserId,
+        message,
+        link
+      );
+      notification_result = await notification.createNotification();
+    }
+
+    const response_obj = {
+      follow_status: result,
+      notification_result,
+    };
+
+    return response_obj;
   };
 
   static getFollowingUsers = async (userId) => {

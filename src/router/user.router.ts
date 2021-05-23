@@ -133,9 +133,10 @@ class UserRouter {
     next: NextFunction
   ) => {
     try {
-      const userId = req.user.userId;
+      // const userId = req.user.userId;
+      const user = req.user;
       const followingUserId = req.body.followingUserId;
-      const result = await UserService.followUser(userId, followingUserId);
+      const result = await UserService.followUser(user, followingUserId);
       res.status(200).send(result);
     } catch (error) {
       next(error);

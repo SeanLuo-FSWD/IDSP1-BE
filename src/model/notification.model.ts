@@ -63,6 +63,8 @@ class NotificationModel {
       .find({
         receiverId: receiverId,
       })
+      .limit(11)
+      .sort({ _id: -1 })
       .toArray();
 
     console.log("notification.model.ts - getNotification : result");
