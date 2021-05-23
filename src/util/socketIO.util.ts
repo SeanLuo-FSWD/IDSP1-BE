@@ -53,6 +53,27 @@ class SocketIO {
       //user and correspond socket id caching
       this.cacheUser(socketUser);
 
+      // receive and emit notification
+      socket.on("notification", (data) => {
+        // {
+        //   receiverId: '60a76224da25031a2c9d38d0',
+        //   createdAt: 'Sat May 22 2021 00:17:27 GMT-0700 (Pacific Daylight Time)',
+        //   message: 'sponge bob has liked your post',
+        //   link: '/post/60a76986e29a171eb6d18661',
+        //   _id: '60a8b0072a244a32f6f7015d'
+        // }
+
+        console.log("notification data ~~~~~~~~~");
+        console.log(data);
+
+        const matchedUser = this._users[data.receiverId];
+        if (matchedUser) {
+          const socketId = matchedUser.id;
+          // socket.to(socketId).emit("notification", data);
+          socket.to(socketId).emit("notification");
+        }
+      });
+
       //user enter chatroom
       socket.on("enter chatroom", (data) => {
         // const room_status = socket.rooms.indexOf(data.conversationId) >= 0;
@@ -81,11 +102,6 @@ class SocketIO {
       socket.on("addNewMemberToGroup", async (data) => {
         const conversationId = data.conversationId;
         const newMembers = data.newMembers;
-        console.log("1111111111111111111111");
-        console.log("conversationId");
-        console.log(conversationId);
-        console.log("newMembers");
-        console.log(newMembers);
 
         const result = await ConversationModel.addNewMembersToConversation(
           conversationId,
@@ -104,7 +120,7 @@ class SocketIO {
         // this._io.to(msg.conversationId).emit("received", { messages });
 
         this._io.to(msg.conversationId).emit("received", {
-          newMsg: newMessage
+          newMsg: newMessage,
         });
 
         //emit to chats list
