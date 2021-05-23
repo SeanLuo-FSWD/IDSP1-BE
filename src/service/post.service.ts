@@ -61,7 +61,7 @@ class PostService {
 
     let notification_result = null;
 
-    if (result === "liked") {
+    if (result === "liked" && user.userId !== receiverId) {
       const message = `${user.username} has liked your post`;
       const link = `/post/${postId}`;
       const notification = new NotificationModel(receiverId, message, link);

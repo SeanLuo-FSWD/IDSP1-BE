@@ -22,7 +22,13 @@ class CommentService {
         message,
         link
       );
-      const notification_result = await notification.createNotification();
+
+      let notification_result = null;
+
+      if (user.userId !== comment.receiverId) {
+        notification_result = await notification.createNotification();
+      }
+
       const response_obj = {
         result,
         notification_result,

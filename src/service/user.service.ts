@@ -49,7 +49,7 @@ class UserService {
 
     let notification_result = null;
 
-    if (result === "followed") {
+    if (result === "followed" && user.userId !== followingUserId) {
       const message = `${user.username} has followed you`;
       const link = `/person/${user.userId}`;
       const notification = new NotificationModel(

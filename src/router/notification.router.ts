@@ -52,19 +52,6 @@ class NotificationRouter {
     }
   };
 
-  //   private createNotification = async (
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ) => {
-  //     try {
-  //       const result = await this._notificationService.createNotification(req);
-  //       res.status(200).send(result);
-  //     } catch (error) {
-  //       next(error);
-  //     }
-  //   };
-
   private deleteNotification = async (
     req: Request,
     res: Response,

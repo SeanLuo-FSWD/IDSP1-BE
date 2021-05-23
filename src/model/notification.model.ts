@@ -80,10 +80,6 @@ class NotificationModel {
       receiverId: userId,
     });
 
-    console.log("notification.model.ts - clearAllNotifications : deleteResult");
-
-    console.log(deleteResult);
-
     return Boolean(deleteResult.result.n);
   }
 }
