@@ -26,6 +26,7 @@ class App {
         this._port = process.env.PORT || 8000;
         this.initErrorHandling();
         this._socketIO = new SocketIO(this._app);
+        this.initHostingReactUI();
     }
 
     public async startServer() {

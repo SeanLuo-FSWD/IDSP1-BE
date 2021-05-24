@@ -15,8 +15,9 @@ class ConversationModel {
   }
 
   public create = async () => {
-    const newConversation: { _id?: string; members: string[] } = {
+    const newConversation: { _id?: string; members: string[], createdAt: number } = {
       members: this._members,
+      createdAt: Date.now()
     };
     await this._db.collection("conversation").insertOne(newConversation);
     return newConversation;
@@ -101,27 +102,6 @@ class ConversationModel {
         }
       ])
       .toArray();
-
-    // let displayedConversations = result;
-
-
-    // if (displayedConversations.length > 0) {
-    //   //   displayedConversations = result.filter((conversation) => {
-    //   //     conversation.messages.length;
-    //   //   });
-
-    //   displayedConversations = result.filter((conversation) => {
-
-    //     return conversation.messages.length > 0;
-    //   });
-
-    //   displayedConversations.sort((a, b) => {
-    //     const a_date: any = new Date(a.messages[0].createdAt);
-    //     const b_date: any = new Date(b.messages[0].createdAt);
-
-    //     return b_date - a_date;
-    //   });
-    // }
 
     return result;
   };
