@@ -1,7 +1,7 @@
 import ConversationModel from "../model/conversation.model";
 
 class ConversationService {
-    public getConversationByConversationId = async (members) => {
+    public getConversationByMembers = async (members) => {
         const matchedConversation = await ConversationModel.getConversationByMembers(members);
 
         if (matchedConversation.length) {
@@ -17,17 +17,6 @@ class ConversationService {
             }
         }
     }
-
-  public getConversationByMembers = async (members) => {
-    const matchedConversation =
-      await ConversationModel.getConversationByMembers(members);
-
-    if (matchedConversation.length) {
-      return matchedConversation[0];
-    } else {
-      return null;
-    }
-  };
 
   public getAllConversationsByUserId = async (userId) => {
     const conversations = await ConversationModel.getAllConversationsByUserId(

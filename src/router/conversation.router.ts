@@ -14,15 +14,14 @@ class ConversationRouter {
   }
 
   private initializeRoutes() {
-    this.router.post("/", this.getConversationByConversationId);
+    this.router.post("/", this.getConversationByMembers);
     this.router.get("/:conversationId/message", this.getMessagesInConversation);
     this.router.get("/", this.getAllConversationsByUserId);
-    this.router.post("/person", this.getConversationByMembers);
   }
 
   // renamed from "getConversationIdByMembers" to  "getConversationByConversationId", to match what code actually do.
   // same for the route "this.router.post("/", this.getConversationIdByMembers)"
-  private getConversationByConversationId = async (
+  private getConversationByMembers = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -35,30 +34,10 @@ class ConversationRouter {
     const membersInConversation = [...target, senderId];
 
     try {
-      const conversation = await this._service.getConversationByConversationId(
-        membersInConversation
-      );
-      res.status(200).send(conversation);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  private getConversationByMembers = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const senderId = req.user.userId;
-    const target = req.body.target;
-    const membersInConversation = [...target, ...[senderId]];
-
-    try {
       const conversation = await this._service.getConversationByMembers(
         membersInConversation
       );
-      if (conversation) res.status(200).send(conversation._id);
-      else res.status(200).end();
+      res.status(200).send(conversation);
     } catch (error) {
       next(error);
     }
