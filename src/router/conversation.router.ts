@@ -54,7 +54,7 @@ class ConversationRouter {
       const messages = await database
         .collection("message")
         .find({ conversationId: conversationId })
-        .limit(5)
+        .limit(12)
         .sort({ _id: -1 })
         .toArray();
       res.status(200).send({ messages });

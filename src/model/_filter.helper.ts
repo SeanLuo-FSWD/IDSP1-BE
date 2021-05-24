@@ -18,8 +18,11 @@ class FilterHelper {
     let kw_query_arr = [];
 
     kwArr.forEach((kw) => {
+      const match_val = `.*${kw}.*`;
+
       kw_query_arr.push({
-        text: { $regex: `.*${kw}.*` },
+        // text: { $regex: `.*${kw}.*` },
+        text: new RegExp(match_val, "i"),
       });
     });
 

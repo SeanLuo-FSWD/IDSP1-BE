@@ -40,7 +40,7 @@ class PostModel {
         .sort({ _id: -1 })
         .toArray();
     }
-    
+
     return desired_posts;
   }
 
@@ -126,6 +126,11 @@ class PostModel {
       .collection("post")
       .aggregate([
         {
+          $match: {
+            _id: { $eq: new ObjectId(postId) },
+          },
+        },
+        {
           $addFields: { postId: { $toString: "$_id" } },
         },
         {
@@ -147,6 +152,10 @@ class PostModel {
       ])
       .toArray();
 
+    console.log("post.model - getFullPostByPostId : post");
+    console.log("post");
+    console.log(post);
+
     return post[0];
   };
 
@@ -154,7 +163,6 @@ class PostModel {
     userId: string,
     newAvatarLink: string
   ) => {
-
     const database = getDB();
     await database.collection("post").update(
       {

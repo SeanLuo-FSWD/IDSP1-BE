@@ -5,7 +5,7 @@ import PostRouter from "./post.router";
 import PeopleRouter from "./people.router";
 import CommentRouter from "../router/comment.router";
 import ConversationRouter from "./conversation.router";
-
+import NotificationRouter from "./notification.router";
 import { checkAuth } from "../middleware/authentication.middleware";
 
 class APIRouter {
@@ -17,6 +17,7 @@ class APIRouter {
     new CommentRouter(),
     new PeopleRouter(),
     new ConversationRouter(),
+    new NotificationRouter(),
   ];
   constructor() {
     this.initRouters();

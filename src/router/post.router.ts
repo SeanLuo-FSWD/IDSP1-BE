@@ -83,8 +83,13 @@ class PostRouter {
     try {
       const user = req.user;
       const postId = req.body.postId;
-      const result = await PostService.toggleLikePost(user, postId);
-      res.status(200).send({ message: result });
+      const receiverId = req.body.receiverId;
+
+      console.log("post.router.ts - toggleLikePost : postId");
+      console.log(postId);
+
+      const result = await PostService.toggleLikePost(user, postId, receiverId);
+      res.status(200).send({ data: result });
     } catch (error) {
       next(error);
     }

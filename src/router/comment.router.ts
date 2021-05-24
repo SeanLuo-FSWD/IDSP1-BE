@@ -27,6 +27,7 @@ class CommentRouter {
         user,
         commentBody
       );
+
       res.status(200).send(result);
     } catch (error) {
       next(error);

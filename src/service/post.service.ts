@@ -1,6 +1,7 @@
 import PostModel from "../model/post.model";
 import ImageModel from "../model/image.model";
 import LikeModel from "../model/like.model";
+import NotificationModel from "../model/notification.model";
 
 class PostService {
   public async getFeed(filter: any, req: any) {
@@ -46,10 +47,10 @@ class PostService {
     };
   }
 
-  static async toggleLikePost(user, postId) {
+  static async toggleLikePost(user, postId, receiverId) {
     const post = await PostModel.getPostByPostId(postId);
-    if (!post) {
 
+    if (!post) {
       throw {
         status: 404,
         message: "Post not found.",
@@ -57,7 +58,23 @@ class PostService {
     }
 
     const result = await PostModel.togglePostLike(user, postId);
-    return result;
+
+    let notification_result = null;
+
+    if (result === "liked" && user.userId !== receiverId) {
+      const message = `${user.username} has liked your post`;
+      const link = `/post/${postId}`;
+      const notification = new NotificationModel(receiverId, message, link);
+      notification_result = await notification.createNotification();
+    }
+
+    const response_obj = {
+      like_status: result,
+      notification_result,
+    };
+
+    // return result;
+    return response_obj;
   }
 
   static async getFullPostByPostId(postId: string) {

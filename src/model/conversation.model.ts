@@ -15,9 +15,13 @@ class ConversationModel {
   }
 
   public create = async () => {
-    const newConversation: { _id?: string; members: string[], createdAt: number } = {
+    const newConversation: {
+      _id?: string;
+      members: string[];
+      createdAt: number;
+    } = {
       members: this._members,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     await this._db.collection("conversation").insertOne(newConversation);
     return newConversation;
@@ -61,7 +65,7 @@ class ConversationModel {
               $toString: "$_id",
             },
             _id: 0,
-            createdAt: 1
+            createdAt: 1,
           },
         },
         {
@@ -102,7 +106,6 @@ class ConversationModel {
         }
       ])
       .toArray();
-
     return result;
   };
 
