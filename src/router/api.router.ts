@@ -7,8 +7,6 @@ import CommentRouter from "../router/comment.router";
 import ConversationRouter from "./conversation.router";
 import NotificationRouter from "./notification.router";
 import { checkAuth } from "../middleware/authentication.middleware";
-import errorHandlingMiddleware from "../middleware/errorHandling.middleware";
-import initNodemailer from "../util/nodemailer.util";
 
 class APIRouter {
   public router = Router();
