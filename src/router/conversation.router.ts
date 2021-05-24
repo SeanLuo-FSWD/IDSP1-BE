@@ -94,9 +94,6 @@ class ConversationRouter {
       const conversations = await this._service.getAllConversationsByUserId(
         userId
       );
-      // const displayedConversations = conversations.filter(
-      //   (conversation) => conversation.messages.length
-      // );
 
       res.status(200).send(conversations);
     } catch (error) {

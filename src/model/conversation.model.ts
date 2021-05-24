@@ -77,38 +77,33 @@ class ConversationModel {
               { $sort: { createdAt: -1 } },
               { $limit: 1 },
             ],
-            as: "messages",
+            as: "latestMessage",
           },
         },
         {
-          $match: {
-            messages: { $exists: true },
-          },
+          $addFields: {
+            "orderTimeStamp": {
+              $cond: {
+                if: {
+                  $anyElementTrue: "$latestMessage"
+                },
+                then: {
+                  $arrayElemAt: ["$latestMessage.createdAt", 0]
+                },
+                else: "$createdAt"
+              }
+            }
+          }
+        },
+        {
+          $sort: {
+            "orderTimeStamp": -1
+          }
         }
       ])
       .toArray();
-      console.log("--- get conversation by user Id ---", result);
-    let displayedConversations = result;
-      console.log("displayedConversations", result);
-    if (displayedConversations.length > 0) {
-      //   displayedConversations = result.filter((conversation) => {
-      //     conversation.messages.length;
-      //   });
 
-      displayedConversations = result.filter((conversation) => {
-
-        return conversation.messages.length > 0;
-      });
-
-      displayedConversations.sort((a, b) => {
-        const a_date: any = new Date(a.messages[0].createdAt);
-        const b_date: any = new Date(b.messages[0].createdAt);
-
-        return b_date - a_date;
-      });
-    }
-
-    return displayedConversations;
+    return result;
   };
 
   static getMessagesInConversation = async (conversationId) => {
