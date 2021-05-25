@@ -120,11 +120,38 @@ class PostModel {
 
   static getPostsByUserId = async (userId: string) => {
     const database = getDB();
+
+    console.log("getPostsByUserId : userId");
+    console.log(userId);
+
     const posts = await database
       .collection("post")
-      .find({ userId: userId })
+      // .find({ userId: userId })
+      .aggregate([
+        {
+          $match: {
+            userId: { $eq: userId },
+          },
+        },
+        {
+          $addFields: { _id: { $toString: "$_id" } },
+        },
+        {
+          $lookup: {
+            from: "like",
+            localField: "_id",
+            foreignField: "postId",
+            as: "like_arr",
+          },
+        },
+      ])
       .sort({ createdAt: -1 })
       .toArray();
+
+    console.log("xxxxxxx getPostsByUserId xxxxxxxx");
+
+    console.log("posts");
+    console.log(posts);
 
     return posts;
   };
