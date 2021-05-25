@@ -44,12 +44,32 @@ class FilterHelper {
       post_arr_query.push(await { $match: { "images.0": { $exists: true } } });
     }
 
+    const merged_query = [
+      ...post_arr_query,
+      ...[
+        {
+          $addFields: { _id: { $toString: "$_id" } },
+        },
+        {
+          $lookup: {
+            from: "like",
+            localField: "_id",
+            foreignField: "postId",
+            as: "like_arr",
+          },
+        },
+      ],
+    ];
+
     postCollection = await this._db
       .collection("post")
-      .aggregate(post_arr_query)
+      // .aggregate(post_arr_query)
+      .aggregate(merged_query)
       .sort({ _id: -1 });
 
-    return await postCollection.toArray();
+    const result = await postCollection.toArray();
+
+    return await result;
   }
 
   private async getUserCollection() {
@@ -105,6 +125,7 @@ class FilterHelper {
         }
       );
     }
+
     const userCollection = await this._db
       .collection("user")
       .aggregate(user_arr_query)
