@@ -34,9 +34,26 @@ class PostModel {
       desired_posts = filterHelper.applyFilter();
     } else {
       const database = getDB();
+      // desired_posts = await database
+      //   .collection("post")
+      //   .find()
+      //   .sort({ _id: -1 })
+      //   .toArray();
       desired_posts = await database
         .collection("post")
-        .find()
+        .aggregate([
+          {
+            $addFields: { _id: { $toString: "$_id" } },
+          },
+          {
+            $lookup: {
+              from: "like",
+              localField: "_id",
+              foreignField: "postId",
+              as: "like_arr",
+            },
+          },
+        ])
         .sort({ _id: -1 })
         .toArray();
     }
@@ -103,11 +120,38 @@ class PostModel {
 
   static getPostsByUserId = async (userId: string) => {
     const database = getDB();
+
+    console.log("getPostsByUserId : userId");
+    console.log(userId);
+
     const posts = await database
       .collection("post")
-      .find({ userId: userId })
+      // .find({ userId: userId })
+      .aggregate([
+        {
+          $match: {
+            userId: { $eq: userId },
+          },
+        },
+        {
+          $addFields: { _id: { $toString: "$_id" } },
+        },
+        {
+          $lookup: {
+            from: "like",
+            localField: "_id",
+            foreignField: "postId",
+            as: "like_arr",
+          },
+        },
+      ])
       .sort({ createdAt: -1 })
       .toArray();
+
+    console.log("xxxxxxx getPostsByUserId xxxxxxxx");
+
+    console.log("posts");
+    console.log(posts);
 
     return posts;
   };
@@ -135,6 +179,14 @@ class PostModel {
         },
         {
           $lookup: {
+            from: "like",
+            localField: "postId",
+            foreignField: "postId",
+            as: "like_arr",
+          },
+        },
+        {
+          $lookup: {
             from: "comment",
             localField: "postId",
             foreignField: "postId",
@@ -151,10 +203,6 @@ class PostModel {
         },
       ])
       .toArray();
-
-    console.log("post.model - getFullPostByPostId : post");
-    console.log("post");
-    console.log(post);
 
     return post[0];
   };

@@ -67,9 +67,6 @@ class NotificationModel {
       .sort({ _id: -1 })
       .toArray();
 
-    console.log("notification.model.ts - getNotification : result");
-    console.log(result);
-
     return result;
   }
 

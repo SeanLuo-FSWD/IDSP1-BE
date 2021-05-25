@@ -80,6 +80,7 @@ class UserRouter {
   };
 
   private authenticate = (req: Request, res: Response) => {
+    console.log("2222222222222222");
     res.status(200).send(req.user);
   };
 
