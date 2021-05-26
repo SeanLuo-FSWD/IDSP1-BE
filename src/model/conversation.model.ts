@@ -31,15 +31,9 @@ class ConversationModel {
     userId: string,
     newAvatarLink: string
   ) => {
-    console.log("1111111111111111111111");
-    console.log("updateUserConversationAvatar");
-    console.log(userId);
-    console.log(newAvatarLink);
-
     const database = getDB();
     await database.collection("conversation").updateMany(
       {
-        // "members.username": { $eq: userId },
         "members.userId": userId,
       },
       {
