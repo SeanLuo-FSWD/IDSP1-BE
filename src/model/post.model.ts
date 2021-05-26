@@ -208,7 +208,7 @@ class PostModel {
     newAvatarLink: string
   ) => {
     const database = getDB();
-    await database.collection("post").update(
+    await database.collection("post").updateMany(
       {
         userId: userId,
       },
