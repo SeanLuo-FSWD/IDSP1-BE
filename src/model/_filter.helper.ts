@@ -14,7 +14,7 @@ class FilterHelper {
     this._userId = userId;
   }
 
-  private async postTextQuery(kwArr: Array<string>) {
+  private postTextQuery(kwArr: Array<string>) {
     let kw_query_arr = [];
 
     kwArr.forEach((kw) => {
@@ -38,27 +38,35 @@ class FilterHelper {
     let postCollection: any = [];
 
     if (this._filter.feed.keywords.length > 0) {
-      post_arr_query.push(await this.postTextQuery(this._filter.feed.keywords));
+      post_arr_query.push(
+        this.postTextQuery(this._filter.feed.keywords)
+      );
     }
     if (this._filter.feed.hasImg) {
-      post_arr_query.push(await { $match: { "images.0": { $exists: true } } });
+      post_arr_query.push(
+        { 
+          $match: { 
+            "images.0": { 
+              $exists: true 
+            } 
+          } 
+        }
+      );
     }
 
     const merged_query = [
       ...post_arr_query,
-      ...[
-        {
-          $addFields: { _id: { $toString: "$_id" } },
+      {
+        $addFields: { _id: { $toString: "$_id" } },
+      },
+      {
+        $lookup: {
+          from: "like",
+          localField: "_id",
+          foreignField: "postId",
+          as: "like_arr",
         },
-        {
-          $lookup: {
-            from: "like",
-            localField: "_id",
-            foreignField: "postId",
-            as: "like_arr",
-          },
-        },
-      ],
+      },
     ];
 
     postCollection = await this._db
