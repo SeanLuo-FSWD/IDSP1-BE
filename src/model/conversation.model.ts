@@ -27,6 +27,30 @@ class ConversationModel {
     return newConversation;
   };
 
+  static updateUserConversationAvatar = async (
+    userId: string,
+    newAvatarLink: string
+  ) => {
+    console.log("1111111111111111111111");
+    console.log("updateUserConversationAvatar");
+    console.log(userId);
+    console.log(newAvatarLink);
+
+    const database = getDB();
+    await database.collection("conversation").updateMany(
+      {
+        // "members.username": { $eq: userId },
+        "members.userId": userId,
+      },
+      {
+        $set: {
+          "members.$.avatar": newAvatarLink,
+        },
+      }
+    );
+    return "success";
+  };
+
   static getConversationByMembers = async (memberIds: string[]) => {
     const database = getDB();
     const result = await database
@@ -86,24 +110,24 @@ class ConversationModel {
         },
         {
           $addFields: {
-            "orderTimeStamp": {
+            orderTimeStamp: {
               $cond: {
                 if: {
-                  $anyElementTrue: "$latestMessage"
+                  $anyElementTrue: "$latestMessage",
                 },
                 then: {
-                  $arrayElemAt: ["$latestMessage.createdAt", 0]
+                  $arrayElemAt: ["$latestMessage.createdAt", 0],
                 },
-                else: "$createdAt"
-              }
-            }
-          }
+                else: "$createdAt",
+              },
+            },
+          },
         },
         {
           $sort: {
-            "orderTimeStamp": -1
-          }
-        }
+            orderTimeStamp: -1,
+          },
+        },
       ])
       .toArray();
     return result;

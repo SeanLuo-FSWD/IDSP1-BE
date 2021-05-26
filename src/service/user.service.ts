@@ -6,6 +6,7 @@ import ImageModel from "../model/image.model";
 import FollowingModels from "../model/following.model";
 import FollowingModel from "../model/following.model";
 import NotificationModel from "../model/notification.model";
+import ConversationModel from "../model/conversation.model";
 
 class UserService {
   static updateUserAvatar = async (userId, image) => {
@@ -35,6 +36,10 @@ class UserService {
       await PostModel.updateUserPostsAvatar(userId, newAvatarLink);
       await CommentModel.updateUserCommentsAvatar(userId, newAvatarLink);
       await LikeModel.updateUserLikesAvatar(userId, newAvatarLink);
+      await ConversationModel.updateUserConversationAvatar(
+        userId,
+        newAvatarLink
+      );
     }
     const result = await UserModel.getUserById(userId);
 
