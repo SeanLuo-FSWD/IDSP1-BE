@@ -39,9 +39,11 @@ class FilterHelper {
 
     if (this._filter.feed.keywords.length > 0) {
       post_arr_query.push(await this.postTextQuery(this._filter.feed.keywords));
+      // post_arr_query.push(this.postTextQuery(this._filter.feed.keywords));
     }
     if (this._filter.feed.hasImg) {
-      post_arr_query.push(await { $match: { "images.0": { $exists: true } } });
+      // post_arr_query.push(await { $match: { "images.0": { $exists: true } } });
+      post_arr_query.push({ $match: { "images.0": { $exists: true } } });
     }
 
     const merged_query = [
@@ -63,9 +65,9 @@ class FilterHelper {
 
     postCollection = await this._db
       .collection("post")
-      // .aggregate(post_arr_query)
       .aggregate(merged_query)
       .sort({ _id: -1 });
+    // .limit(5);
 
     const result = await postCollection.toArray();
 
