@@ -11,11 +11,13 @@ module.exports = (app) => {
   app.use(morgan("tiny"));
   //need to be cleanedup for deployment
   app.use(
-    cors({
-      origin: "http://localhost:3000",
-      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-      credentials: true,
-    })
+    cors(
+      // {
+      //   origin: "http://localhost:3000",
+      //   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+      //   credentials: true,
+      // }
+    )
   );
   app.use(sessionMiddlware);
   app.use(passport.initialize());
