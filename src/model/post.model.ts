@@ -34,11 +34,6 @@ class PostModel {
       desired_posts = filterHelper.applyFilter();
     } else {
       const database = getDB();
-      // desired_posts = await database
-      //   .collection("post")
-      //   .find()
-      //   .sort({ _id: -1 })
-      //   .toArray();
       desired_posts = await database
         .collection("post")
         .aggregate([
@@ -55,6 +50,7 @@ class PostModel {
           },
         ])
         .sort({ _id: -1 })
+        // .limit(5)
         .toArray();
     }
 
@@ -212,7 +208,7 @@ class PostModel {
     newAvatarLink: string
   ) => {
     const database = getDB();
-    await database.collection("post").update(
+    await database.collection("post").updateMany(
       {
         userId: userId,
       },

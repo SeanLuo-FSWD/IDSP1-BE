@@ -26,14 +26,11 @@ class ConversationRouter {
     res: Response,
     next: NextFunction
   ) => {
-    const target = req.body.target;
-
-    // const senderId = req.body.userId;
-    const senderId = req.user.userId;
-
-    const membersInConversation = [...target, senderId];
-
     try {
+      const target = req.body.target;
+      // const senderId = req.body.userId;
+      const senderId = req.user.userId;
+      const membersInConversation = [...target, senderId];
       const conversation = await this._service.getConversationByMembers(
         membersInConversation
       );
