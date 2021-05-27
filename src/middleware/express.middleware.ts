@@ -12,11 +12,11 @@ module.exports = (app) => {
   //need to be cleanedup for deployment
   app.use(
     cors(
-      // {
-      //   origin: "http://localhost:3000",
-      //   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-      //   credentials: true,
-      // }
+      {
+        origin: "http://localhost:3000",
+        methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+        credentials: true,
+      }
     )
   );
   app.use(sessionMiddlware);
